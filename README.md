@@ -1,8 +1,13 @@
 # Carbon Higher or Lower
 
-A phone-first trial of the Higher-or-Lower format for Bocconi 30296, Global
-Sustainability Strategy. Five vegetables, ranked by the greenhouse gases
-emitted to put one 80 g portion on the plate.
+A phone-first Higher-or-Lower game for Bocconi 30296, Global Sustainability
+Strategy. **51 foods, 50 comparisons**, each ranked by the greenhouse gases
+emitted to put one standard portion on the plate — so the portion size counts
+as much as how the food is produced.
+
+The six pairs from the course's own food quiz (beef/carrots, beer/milk,
+tuna/ham, potatoes/tofu, peanut butter/biscuits, red wine/gin) are kept as
+adjacent links in the chain.
 
 Play: https://nicolamisani.com/higher-or-lower/
 
