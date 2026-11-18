@@ -1,4 +1,4 @@
-# Carbon Higher or Lower
+# LCA Higher or Lower
 
 A phone-first Higher-or-Lower game for Bocconi 30296, Global Sustainability
 Strategy. **51 foods, 50 comparisons**, each ranked by the greenhouse gases
