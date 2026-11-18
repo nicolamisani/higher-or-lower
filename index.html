@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0f0c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Carbon Higher or Lower</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+<!-- GENERATED FILE - do not edit.
+     Source: higher_or_lower.html  |  Rebuild: python3 make_standalone.py -->
+</head>
+<body>
+<style>
+  /* --- what the artifact platform supplies, restated for a standalone file --- */
+  *,*::before,*::after{box-sizing:border-box}
+  [hidden]{display:none!important}
+  img{max-width:100%}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0}
+  /* a phone opened from a chat app: no double-tap zoom, no text selection
+     while tapping the two buttons, and the status bar tinted to match */
+  body{-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  button{touch-action:manipulation}
+  /* the platform pads the root by the safe-area insets; a full-screen game
+     handles them per element instead, so the panels stay exactly half-height */
+  #hud{padding-top:calc(.7rem + env(safe-area-inset-top,0px))}
+
+/* Layout: two full-bleed panels stacked vertically, half the screen each.
+   The deck is one tall column translated upward by exactly one panel per
+   round, so the winner of each call becomes the reference for the next. */
+:root{
+  --ink:#ffffff;
+  --ink-dim:rgba(255,255,255,.72);
+  --ink-faint:rgba(255,255,255,.45);
+  --shade:#0d0f0c;          /* deliberate single dark world: a game screen */
+  --right:#4ade80;
+  --wrong:#f87171;
+  --display:'Barlow Condensed','Oswald','Arial Narrow',system-ui,sans-serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--shade);
+  color:var(--ink);
+  font-family:var(--body);
+  overflow:hidden;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- frame ---------- */
+#game{position:relative;height:100%;overflow:hidden}
+
+#hud{
+  position:absolute;top:0;left:0;right:0;z-index:30;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding-block:.7rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  pointer-events:none;
+  font-family:var(--display);
+  text-shadow:0 1px 6px rgba(0,0,0,.55);
+}
+.hud-l{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-family:var(--body);font-weight:500}
+.hud-r{text-align:right;line-height:1}
+.hud-score{font-size:1.9rem;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.hud-best{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-family:var(--body);font-weight:500;margin-top:.15rem}
+
+/* ---------- the deck ---------- */
+#stack{position:absolute;top:0;left:0;right:0;transform:translateY(0);transition:transform .62s cubic-bezier(.65,.02,.3,1)}
+.panel{
+  position:relative;width:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;overflow:hidden;
+  padding-block:1rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.panel::before{  /* the vegetable's own colour, as a duotone wash */
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 10%, var(--c1) 0%, var(--c2) 62%, var(--c3) 100%);
+}
+.panel::after{   /* big quiet motif, never read as content */
+  content:attr(data-motif);
+  position:absolute;right:-.08em;bottom:-.22em;
+  font-size:min(44vw,15rem);line-height:1;
+  opacity:.1;filter:grayscale(.2);pointer-events:none;
+}
+.panel>*{position:relative;z-index:2}
+/* the lower half sits directly under the VS badge, so its content starts
+   below the badge's reach - otherwise a two-line name runs into it */
+.panel.challenger{padding-top:2.2rem}
+/* the challenger carries a name, a placeholder and two buttons in one half,
+   so its placeholder is set small - the buttons already ask the question */
+.panel.challenger .qmark{font-size:clamp(1.8rem,8vw,2.8rem)}
+.panel.challenger .lead{margin-top:.55rem}
+.panel.challenger .calls{margin-top:.8rem}
+
+.name{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(1.45rem,7.2vw,2.5rem);
+  line-height:1.02;letter-spacing:.005em;
+  text-transform:uppercase;text-wrap:balance;
+  max-width:16ch;
+  text-shadow:0 2px 14px rgba(0,0,0,.4);
+}
+.note{
+  font-size:.74rem;color:var(--ink-dim);margin-top:.3rem;
+  letter-spacing:.04em;max-width:26ch;
+}
+.lead{
+  font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:.9rem;font-weight:500;
+}
+.figure{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(3rem,17vw,5.6rem);line-height:.92;
+  letter-spacing:-.01em;font-variant-numeric:tabular-nums;
+  text-shadow:0 3px 18px rgba(0,0,0,.45);
+}
+.unit{
+  font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-dim);margin-top:.35rem;font-weight:500;
+}
+.why{
+  font-size:.78rem;line-height:1.35;color:var(--ink);
+  margin-top:.85rem;max-width:30ch;opacity:0;transform:translateY(6px);
+  transition:opacity .4s ease .35s, transform .4s ease .35s;
+}
+.why.on{opacity:.92;transform:none}
+
+/* the question mark the challenger wears until it is answered */
+.qmark{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(3rem,17vw,5.6rem);line-height:.92;color:var(--ink-faint);
+}
+
+/* ---------- the two buttons ---------- */
+.calls{display:flex;flex-direction:column;gap:.55rem;margin-top:1.15rem;width:min(15rem,78vw)}
+.call{
+  appearance:none;border:1.5px solid rgba(255,255,255,.85);
+  background:rgba(0,0,0,.14);color:var(--ink);
+  font-family:var(--display);font-size:1.12rem;font-weight:600;
+  letter-spacing:.17em;text-transform:uppercase;
+  padding:.62rem 1rem;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  transition:background .16s ease,transform .1s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.call:hover{background:rgba(255,255,255,.18)}
+.call:active{transform:scale(.97)}
+.call:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.call svg{width:.78em;height:.78em;flex:none}
+
+/* ---------- the VS badge, pinned to the seam ---------- */
+#seam{
+  position:absolute;top:50%;left:50%;z-index:25;
+  transform:translate(-50%,-50%);
+  width:3.4rem;height:3.4rem;border-radius:50%;
+  background:#fff;color:#111;
+  display:grid;place-items:center;
+  font-family:var(--display);font-weight:700;font-size:1.05rem;
+  letter-spacing:.06em;
+  box-shadow:0 0 0 5px rgba(13,15,12,.9),0 8px 26px rgba(0,0,0,.5);
+  transition:background .25s ease,color .25s ease,transform .3s ease;
+  pointer-events:none;
+}
+#seam.right{background:var(--right);color:#07230f;transform:translate(-50%,-50%) scale(1.1)}
+#seam.wrong{background:var(--wrong);color:#2b0606;transform:translate(-50%,-50%) scale(1.1)}
+#seam svg{width:1.5rem;height:1.5rem}
+
+/* ---------- end card ---------- */
+#over{
+  position:absolute;inset:0;z-index:40;
+  background:rgba(8,10,8,.93);
+  backdrop-filter:blur(7px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-block:1.4rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  overflow-y:auto;
+  opacity:0;transition:opacity .4s ease;
+}
+#over.on{opacity:1}
+.over-kicker{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.over-score{font-family:var(--display);font-size:clamp(3.4rem,20vw,6rem);font-weight:700;line-height:.9;margin-top:.3rem}
+.over-sub{font-family:var(--display);font-size:1.1rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-top:.1rem}
+.ladder{list-style:none;margin:1.4rem 0 0;padding:0;width:min(23rem,88vw);display:flex;flex-direction:column;gap:.3rem}
+.ladder li{display:flex;align-items:baseline;gap:.6rem;font-size:.86rem;padding:.42rem .7rem;border-radius:7px;background:rgba(255,255,255,.07)}
+.ladder .rk{font-family:var(--display);font-weight:700;color:var(--ink-faint);width:1.2rem;flex:none;font-variant-numeric:tabular-nums}
+.ladder .nm{flex:1;min-width:0;text-align:left}
+.ladder .vl{font-family:var(--display);font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums}
+#again{
+  margin-top:1.4rem;appearance:none;border:0;border-radius:999px;cursor:pointer;
+  background:#fff;color:#111;font-family:var(--display);font-weight:700;
+  font-size:1.05rem;letter-spacing:.15em;text-transform:uppercase;padding:.7rem 2.1rem;
+}
+#again:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.src{margin-top:1.3rem;font-size:.66rem;line-height:1.5;color:var(--ink-faint);max-width:30ch;text-align:center}
+
+/* short viewports (landscape phones) — keep a panel's content inside its half */
+@media (max-height:560px){
+  .name{font-size:clamp(1.1rem,4.4vh,1.6rem);max-width:22ch}
+  .figure,.qmark{font-size:clamp(2rem,9vh,3.2rem)}
+  .lead{margin-top:.4rem}
+  .calls{margin-top:.6rem;gap:.4rem}
+  .call{padding:.45rem 1rem;font-size:.98rem}
+  .why{font-size:.72rem;margin-top:.5rem}
+  .note{font-size:.68rem}
+  #seam{width:2.6rem;height:2.6rem;font-size:.85rem}
+  .panel.challenger{padding-top:1.9rem}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #stack{transition:none}
+  .why{transition:none;opacity:.92;transform:none}
+  #seam{transition:none}
+  #over{transition:none}
+}
+</style>
+
+<div id="game">
+  <div id="hud">
+    <div class="hud-l">g CO₂e · 80 g portion</div>
+    <div class="hud-r">
+      <div class="hud-score" id="score">0</div>
+      <div class="hud-best" id="best">best 0</div>
+    </div>
+  </div>
+  <div id="stack"></div>
+  <div id="seam">VS</div>
+  <div id="over" hidden>
+    <div class="over-kicker">You got</div>
+    <div class="over-score" id="ovScore">0</div>
+    <div class="over-sub" id="ovSub">of 4 right</div>
+    <ol class="ladder" id="ladder"></ol>
+    <button id="again" type="button">Play again</button>
+    <p class="src">Figures: AGRIBALYSE® 3.2 (ADEME), climate change, kg CO₂e per kg of product, scaled to an 80 g portion. Licence Ouverte.</p>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   DATA — AGRIBALYSE 3.2, "Changement climatique", kg CO2e per kg of product,
+   multiplied by the standard 80 g vegetable portion. Deck order is curated:
+   one near-tie, then two reversals of expectation, then the air-freight shock.
+   ====================================================================== */
+var PORTION = 80;                                  // grams
+var DECK = [
+  { name:'Carrot',            perKg:0.396, motif:'🥕',
+    c:['#f0a05a','#c6621f','#6d3310'],
+    why:'Field-grown, stored in the dark, barely processed. Close to the floor for any food.' },
+  { name:'Courgette',         perKg:0.498, motif:'🥒',
+    c:['#9ed36a','#4e8c2f','#1f3d13'],
+    why:'Also field-grown in season. Two unremarkable vegetables land in nearly the same place.' },
+  { name:'Tomato, off season', perKg:2.11, motif:'🍅',
+    c:['#f08878','#c23a2a','#58120e'],
+    why:'Grown under heated glass. In season the same tomato is 0.63 per kg — the heating is the footprint.' },
+  { name:'Asparagus',         perKg:1.64, motif:'🌿',
+    c:['#b9cf80','#6b8a3a','#2e3c17'],
+    why:'Lower than the heated tomato. A long growing season on a lot of land, but nobody heats the field.' },
+  { name:'Green beans, flown from Kenya', perKg:7.08, motif:'🫘',
+    c:['#8fd0a0','#2f7f4e','#0f2d1d'],
+    why:'Identical farming to beans by sea — 0.45 per kg. Transport alone is 6.9 of the 7.08. The plane is the whole story.' }
+];
+
+var g  = function(id){ return document.getElementById(id); };
+var stack = g('stack'), seam = g('seam'), hudScore = g('score'), hudBest = g('best');
+var round = 0, score = 0, busy = false, panelH = 0;
+
+// kg CO2e per kg x 0.080 kg portion, expressed in grams: perKg x 80.
+var shown = function(item){ return Math.round(item.perKg * PORTION); };
+
+/* ---- best score, per viewer, never load-bearing ---------------------- */
+function readBest(){ try { return parseInt(localStorage.getItem('hol_best') || '0', 10) || 0; } catch(e){ return 0; } }
+function writeBest(v){ try { localStorage.setItem('hol_best', String(v)); } catch(e){} }
+
+var CHEV_UP   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+var CHEV_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+var TICK  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg>';
+var CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+var esc = function(t){ return String(t).replace(/[&<>"]/g, function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
+
+/* ==========================================================================
+   BUILD — every panel exists from the start; the deck is simply translated.
+   ====================================================================== */
+function build(){
+  stack.innerHTML = DECK.map(function(it, i){
+    return '<section class="panel" id="p' + i + '" data-motif="' + it.motif + '"' +
+      ' style="--c1:' + it.c[0] + ';--c2:' + it.c[1] + ';--c3:' + it.c[2] + '">' +
+      '<h2 class="name">' + esc(it.name) + '</h2>' +
+      (i === 0 ? '' : '<p class="note" id="n' + i + '" hidden></p>') +
+      '<div class="lead" id="l' + i + '">' + (i === 0 ? 'emits' : 'emits') + '</div>' +
+      '<div class="figure" id="f' + i + '" hidden>0</div>' +
+      '<div class="qmark" id="q' + i + '" hidden>?</div>' +
+      '<div class="unit" id="u' + i + '" hidden>g CO₂e per portion</div>' +
+      '<div class="calls" id="c' + i + '" hidden>' +
+        '<button class="call" type="button" data-dir="up">' + CHEV_UP + 'Higher</button>' +
+        '<button class="call" type="button" data-dir="down">' + CHEV_DOWN + 'Lower</button>' +
+      '</div>' +
+      '<p class="why" id="w' + i + '"></p>' +
+    '</section>';
+  }).join('');
+
+  // panel 0 is the opening reference: its number is on show from the start
+  reveal(0, true);
+  measure();
+  arm();
+}
+
+function measure(){
+  panelH = Math.round(g('game').clientHeight / 2);
+  var ps = stack.querySelectorAll('.panel');
+  for (var i = 0; i < ps.length; i++) ps[i].style.height = panelH + 'px';
+  slide(false);
+}
+
+function slide(animate){
+  stack.style.transition = animate ? '' : 'none';
+  stack.style.transform = 'translateY(' + (-round * panelH) + 'px)';
+  if (!animate) { void stack.offsetHeight; stack.style.transition = ''; }
+}
+
+/* reveal a panel's figure. instant=true skips the count-up */
+function reveal(i, instant){
+  var target = shown(DECK[i]);
+  g('q' + i).hidden = true;
+  g('f' + i).hidden = false;
+  g('u' + i).hidden = false;
+  var el = g('f' + i);
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (instant || reduced) { el.textContent = target; return; }
+  var t0 = null, dur = 900;
+  function step(ts){
+    if (t0 === null) t0 = ts;
+    var p = Math.min(1, (ts - t0) / dur);
+    var e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * e);
+    if (p < 1) requestAnimationFrame(step); else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+/* put the challenger panel into its asking state */
+function arm(){
+  var i = round + 1;
+  if (i >= DECK.length) { finish(); return; }
+  var was = stack.querySelector('.panel.challenger');
+  if (was) was.classList.remove('challenger');
+  g('p' + i).classList.add('challenger');
+  g('q' + i).hidden = false;
+  g('c' + i).hidden = false;
+  g('n' + i).hidden = false;
+  g('n' + i).textContent = 'higher or lower than ' + DECK[round].name.toLowerCase() + '?';
+  seam.className = '';
+  seam.textContent = 'VS';
+  busy = false;
+}
+
+/* ==========================================================================
+   PLAY
+   ====================================================================== */
+stack.addEventListener('click', function(ev){
+  var btn = ev.target.closest ? ev.target.closest('.call') : null;
+  if (!btn || busy) return;
+  busy = true;
+  answer(btn.getAttribute('data-dir'));
+});
+
+function answer(dir){
+  var i = round + 1;
+  var a = shown(DECK[round]), b = shown(DECK[i]);
+  var correct = (dir === 'up') ? (b >= a) : (b < a);
+
+  g('c' + i).hidden = true;
+  g('n' + i).hidden = true;
+  reveal(i, false);
+
+  setTimeout(function(){
+    seam.className = correct ? 'right' : 'wrong';
+    seam.innerHTML = correct ? TICK : CROSS;
+    if (correct) { score++; hudScore.textContent = score; }
+    g('w' + i).textContent = DECK[i].why;
+    g('w' + i).classList.add('on');
+  }, 900);
+
+  setTimeout(function(){
+    round++;
+    if (round + 1 >= DECK.length) { finish(); return; }
+    slide(true);
+    setTimeout(arm, 640);
+  }, 2600);
+}
+
+function finish(){
+  var best = readBest();
+  if (score > best) { best = score; writeBest(best); }
+  hudBest.textContent = 'best ' + best;
+
+  g('ovScore').textContent = score;
+  g('ovSub').textContent = 'of ' + (DECK.length - 1) + ' right';
+  g('ladder').innerHTML = DECK.slice().sort(function(x, y){ return shown(y) - shown(x); })
+    .map(function(it, n){
+      return '<li><span class="rk">' + (n + 1) + '</span>' +
+             '<span class="nm">' + esc(it.name) + '</span>' +
+             '<span class="vl">' + shown(it) + '</span></li>';
+    }).join('');
+
+  var ov = g('over');
+  ov.hidden = false;
+  requestAnimationFrame(function(){ ov.classList.add('on'); });
+}
+
+g('again').addEventListener('click', function(){
+  round = 0; score = 0; busy = false;
+  hudScore.textContent = '0';
+  var ov = g('over');
+  ov.classList.remove('on');
+  ov.hidden = true;
+  build();
+});
+
+window.addEventListener('resize', measure);
+
+hudBest.textContent = 'best ' + readBest();
+build();
+</script>
+</body>
+</html>
