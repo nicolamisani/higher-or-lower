@@ -2,10 +2,15 @@
 
 ## Photographs
 
-**48 of the 51 panels carry a photograph.** Every one is **CC0 1.0** or
-**public domain**: the licence filter was applied at the API, and each record's
-licence field is reproduced below rather than inferred from a search result.
-Attribution is not legally required for any of them; it is given anyway.
+**49 of the 51 panels carry a photograph.** All but one are **CC0 1.0** or **public domain**, and
+each record's licence field is reproduced below rather than inferred from a
+search result.
+
+**The exception is the glass of milk**, which is **CC BY 2.0** by NIAID. CC BY
+requires attribution, so unlike the rest it is credited on the game's final
+screen as well as here. Anyone swapping it for a CC0 photograph can delete that
+clause from the credit line.
+Attribution is not legally required for the CC0 ones; it is given anyway.
 
 Sourced through [Openverse](https://openverse.org/), which aggregates StockSnap,
 Rawpixel, Wikimedia Commons and others. Unsplash, Pexels and Pixabay were not
@@ -13,7 +18,7 @@ used: their images are free to use but are **not** public domain, and each
 carries its own conditions that would have to be re-checked every time this app
 is copied or reused.
 
-**Milk, Cheddar, Lentils have no photograph** and fall back to the flat colour of their food group.
+**Cheddar and Lentils have no photograph** and fall back to the flat colour of their food group.
 That is a supported state, not a missing asset — but they are the obvious place
 to improve the set, and dropping a file named after the food into `photos/` and
 re-running `embed_photos.py` is all it takes.
@@ -31,6 +36,7 @@ re-running `embed_photos.py` is all it takes.
 | Red wine | [Red Wine](https://stocksnap.io/photo/red-wine-3T4TRK0WXS) | Jamie Street | stocksnap | CC0 |
 | Ice cream | [A stack of ice cream scoops drizzled with chocolate and cream on a white plate.](https://wordpress.org/photos/photo/49269f6ff3/) | Vishnu Chandra | wordpress | CC0 |
 | Butter | [Butter and Knive (cropped)](https://commons.wikimedia.org/w/index.php?curid=138043557) | Julikalucky | wikimedia | CC0 |
+| Milk | [Glass of Milk (33657535532).jpg](https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg) | NIAID | wikimedia | CC BY 2.0 |
 | Beer | [Beer Glass](https://stocksnap.io/photo/beer-glass-EWO2FJILM1) | Tim Savage | stocksnap | CC0 |
 | Mozzarella | [Food at Tokyu Plaza Célavi (17128).jpg](https://commons.wikimedia.org/wiki/File:Food_at_Tokyu_Plaza_C%C3%A9lavi_(17128).jpg) | Syced | wikimedia | CC0 |
 | Olive oil | [Olive oil bottles](https://www.rawpixel.com/image/6037430/photo-image-public-domain-free-olive) | not stated | rawpixel | CC0 |
