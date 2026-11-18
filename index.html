@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Carbon Higher or Lower</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap">
 <!-- GENERATED FILE - do not edit.
      Source: higher_or_lower.html  |  Rebuild: python3 make_standalone.py -->
 </head>
@@ -39,6 +39,10 @@
   --right:#4ade80;
   --wrong:#f87171;
   --display:'Barlow Condensed','Oswald','Arial Narrow',system-ui,sans-serif;
+  --cream:#f4efe3;          /* the start screen; the game itself stays dark */
+  --seed:#17190f;
+  --leaf:#6BAC5F;
+  --berry:#C05B58;
   --body:'Inter',system-ui,-apple-system,sans-serif;
   color-scheme:dark;
 }
@@ -52,12 +56,85 @@ body{
   -webkit-text-size-adjust:100%;
 }
 
+/* ---------- the start screen ---------- */
+#start{
+  position:absolute;inset:0;z-index:60;background:var(--cream);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-block:1.6rem;
+  padding-left:max(20px,env(safe-area-inset-left,0px));
+  padding-right:max(20px,env(safe-area-inset-right,0px));
+  overflow-y:auto;
+  transition:opacity .45s ease;
+}
+@supports (justify-content: safe center){ #start{justify-content:safe center} }
+#start.gone{opacity:0;pointer-events:none}
+#start{padding-bottom:4.4rem}
+.start-course{
+  position:absolute;left:0;right:0;
+  bottom:calc(1.15rem + env(safe-area-inset-bottom,0px));
+  text-align:center;font-size:.64rem;line-height:1.55;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:600;color:rgba(21,23,15,.5);
+}
+
+.logo{display:flex;flex-direction:column;align-items:center;flex:none}
+.logo svg{display:block;height:auto}
+.logo .words{
+  font-family:var(--display);text-transform:uppercase;color:var(--seed);
+  font-weight:300;line-height:.96;white-space:nowrap;
+}
+.logo .row{display:block}
+.logo [data-logoline]{display:inline-block}
+.logo b{font-weight:700;font-style:normal}
+
+.pitch{
+  margin:2.6rem 0 0;max-width:27ch;text-align:center;
+  font-size:clamp(.95rem,4.1vw,1.08rem);line-height:1.5;
+  color:rgba(21,23,15,.78);font-weight:400;
+}
+#go{
+  margin-top:2.1rem;appearance:none;border:0;cursor:pointer;border-radius:999px;
+  background:var(--seed);color:var(--cream);
+  font-family:var(--body);font-weight:600;font-size:1.02rem;
+  letter-spacing:.015em;padding:.78rem 2.6rem;
+  transition:transform .1s ease,background .16s ease;
+}
+#go:hover{background:#2c3020}
+#go:active{transform:scale(.97)}
+#go:focus-visible{outline:3px solid var(--seed);outline-offset:3px}
+
+#howto{
+  position:absolute;inset:0;z-index:55;background:var(--cream);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-block:1.6rem 4.4rem;
+  padding-left:max(22px,env(safe-area-inset-left,0px));
+  padding-right:max(22px,env(safe-area-inset-right,0px));
+  overflow-y:auto;transition:opacity .45s ease;
+}
+@supports (justify-content: safe center){ #howto{justify-content:safe center} }
+#howto.gone{opacity:0;pointer-events:none}
+.rules{max-width:30ch;display:flex;flex-direction:column;gap:1.85rem}
+.rules p{
+  margin:0;font-size:clamp(.98rem,4.2vw,1.1rem);line-height:1.52;
+  color:rgba(21,23,15,.82);
+}
+.rules sub{font-size:.72em}
+#play{
+  margin-top:2.6rem;appearance:none;border:0;cursor:pointer;border-radius:999px;
+  background:var(--seed);color:var(--cream);
+  font-family:var(--body);font-weight:600;font-size:1.02rem;
+  letter-spacing:.015em;padding:.78rem 3rem;
+  transition:transform .1s ease,background .16s ease;
+}
+#play:hover{background:#2c3020}
+#play:active{transform:scale(.97)}
+#play:focus-visible{outline:3px solid var(--seed);outline-offset:3px}
+
 /* ---------- frame ---------- */
 #game{position:relative;height:100%;overflow:hidden}
 
 #hud{
   position:absolute;top:0;left:0;right:0;z-index:30;
-  display:flex;justify-content:space-between;align-items:flex-start;
+  display:flex;justify-content:flex-end;align-items:flex-start;
   padding-block:.7rem;
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));
@@ -65,7 +142,6 @@ body{
   font-family:var(--display);
   text-shadow:0 1px 6px rgba(0,0,0,.55);
 }
-.hud-l{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-family:var(--body);font-weight:500}
 .hud-r{text-align:right;line-height:1}
 .hud-score{
   font-size:1.7rem;font-weight:700;letter-spacing:.01em;
@@ -164,20 +240,25 @@ body{
 }
 
 /* ---------- the two buttons ---------- */
-.calls{display:flex;flex-direction:column;gap:.55rem;margin-top:1.15rem;width:min(15rem,78vw)}
+.calls{display:flex;flex-direction:column;gap:.6rem;margin-top:1.15rem;width:min(17rem,84vw)}
 .call{
-  appearance:none;border:1.5px solid rgba(255,255,255,.85);
-  background:rgba(0,0,0,.14);color:var(--ink);
-  font-family:var(--display);font-size:1.12rem;font-weight:600;
-  letter-spacing:.17em;text-transform:uppercase;
-  padding:.62rem 1rem;border-radius:999px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:.5rem;
-  transition:background .16s ease,transform .1s ease;
+  appearance:none;border:0;
+  color:#17190f;
+  font-family:var(--display);font-size:1.42rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;
+  padding:.82rem 1rem;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.55rem;
+  transition:filter .16s ease,transform .1s ease;
   -webkit-tap-highlight-color:transparent;
+  box-shadow:0 3px 14px rgba(0,0,0,.3);
 }
-.call:hover{background:rgba(255,255,255,.18)}
+/* more emissions reads red, fewer reads green */
+.call[data-dir="up"]  {background:#E9A6A3}
+.call[data-dir="down"]{background:#A8D29F}
+.call:hover{filter:brightness(1.07)}
 .call:active{transform:scale(.97)}
 .call:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.call svg{stroke-width:3.4}
 .call svg{width:.78em;height:.78em;flex:none}
 
 /* ---------- the VS badge, pinned to the seam ---------- */
@@ -242,7 +323,7 @@ body{
   .figure,.qmark{font-size:clamp(2rem,9vh,3.2rem)}
   .serve{margin-top:.3rem;font-size:clamp(.85rem,3.4vh,1.05rem)}
   .calls{margin-top:.6rem;gap:.4rem}
-  .call{padding:.45rem 1rem;font-size:.98rem}
+  .call{padding:.55rem 1rem;font-size:1.12rem}
   .why{font-size:.72rem;margin-top:.5rem}
   .note{font-size:.68rem}
   #seam{width:2.6rem;height:2.6rem;font-size:.85rem}
@@ -257,9 +338,29 @@ body{
 }
 </style>
 
+<div id="start">
+  <div class="logo" id="logo"></div>
+  <p class="pitch">Can you guess what is worse? Wine or beer? Tofu or lentils?
+    Compare the carbon emissions of the food and drink you have every day.</p>
+  <button id="go" type="button">I’m in</button>
+  <p class="start-course">30296 Global Sustainability Strategy<br>Bocconi University</p>
+</div>
+
+<div id="howto" hidden>
+  <div class="rules">
+    <p>For each pair of foods or drinks, say which one carries the higher
+      total emissions, measured in grams of CO<sub>2</sub> equivalent.</p>
+    <p>The figure covers the whole life cycle: growing or rearing it,
+      processing, packaging, transport, the shop, and keeping it at home.</p>
+    <p>So the answer depends on the food, and on how much of it you have.
+      Every card shows one real serving, and that serving is part of the answer.</p>
+  </div>
+  <button id="play" type="button">Ready to start</button>
+  <p class="start-course">30296 Global Sustainability Strategy<br>Bocconi University</p>
+</div>
+
 <div id="game">
   <div id="hud">
-    <div class="hud-l">g CO₂e per portion</div>
     <div class="hud-r">
       <div class="hud-score" id="score">&ndash;</div>
     </div>
@@ -1007,10 +1108,87 @@ g('again').addEventListener('click', function(){
   build();
 });
 
-window.addEventListener('resize', measure);
+/* ==========================================================================
+   THE LOGO. Two rounded triangle heads with the name between them, and every
+   line letter-spaced to exactly the triangles' width so the three elements
+   share an edge.
+
+   The spacing is solved once from the unspaced width, never iterated: CSS adds
+   the spacing after every character including the last, the negative right
+   margin cancels that one, so the rendered width is w0 + spacing x (chars - 1).
+   Re-measuring and re-solving drives the spacing to zero, because the measured
+   width already contains it.
+
+   The measurement must happen after the exact face has loaded. document.fonts
+   .ready can resolve first, and the line then gets solved against fallback
+   metrics and comes out short.
+   ========================================================================= */
+function head(dir, w, fill){
+  var h = Math.round(w * 0.46), r = Math.round(w * 0.055), p = r;
+  var pts = dir === 'up'
+    ? [[w/2, p], [w - p, h - p], [p, h - p]]
+    : [[w/2, h - p], [p, p], [w - p, p]];
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" aria-hidden="true">' +
+    '<path d="M' + pts.map(function(q){ return q.join(' '); }).join(' L') + ' Z" ' +
+    'fill="' + fill + '" stroke="' + fill + '" stroke-width="' + (r * 2) +
+    '" stroke-linejoin="round"/></svg>';
+}
+
+function buildLogo(){
+  var box = g('logo');
+  if (!box) return;
+  var w = Math.min(230, Math.round(window.innerWidth * 0.62));
+  var size = Math.round(w * 0.227);
+  /* red points up and green down, matching the buttons: in this game the
+     direction is a quantity of emissions, so red has to mean more of them */
+  box.innerHTML =
+    head('up', w, 'var(--berry)') +
+    '<div class="words" style="font-size:' + size + 'px;margin:' +
+      Math.round(w * 0.068) + 'px 0">' +
+      '<div class="row"><span data-logoline><b>LCA</b> HIGHER</span></div>' +
+      '<div class="row"><span data-logoline>OR LOWER</span></div>' +
+    '</div>' +
+    head('down', w, 'var(--leaf)');
+
+  var fit = function(){
+    box.querySelectorAll('[data-logoline]').forEach(function(line){
+      line.style.letterSpacing = '0px';
+      line.style.marginRight = '0px';
+      var w0 = line.getBoundingClientRect().width;
+      var gaps = line.textContent.length - 1;
+      if (!w0 || gaps < 1) return;
+      var ls = (w - w0) / gaps;
+      line.style.letterSpacing = ls + 'px';
+      line.style.marginRight = (-ls) + 'px';
+    });
+  };
+
+  if (document.fonts && document.fonts.load) {
+    Promise.all(['300 ' + size + 'px "Barlow Condensed"',
+                 '700 ' + size + 'px "Barlow Condensed"']
+      .map(function(f){ return document.fonts.load(f); }))
+      .then(function(){ requestAnimationFrame(fit); });
+  } else {
+    fit();
+  }
+}
+
+/* start -> rules -> game, each one fading out as the next appears */
+function leave(el, then){
+  el.classList.add('gone');
+  setTimeout(function(){ el.hidden = true; if (then) then(); }, 460);
+}
+g('go').addEventListener('click', function(){
+  g('howto').hidden = false;
+  leave(g('start'));
+});
+g('play').addEventListener('click', function(){ leave(g('howto')); });
+
+window.addEventListener('resize', function(){ measure(); buildLogo(); });
 
 paintScore();
 build();
+buildLogo();
 </script>
 </body>
 </html>
