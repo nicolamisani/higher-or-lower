@@ -2,26 +2,25 @@
 
 ## Photographs
 
-**49 of the 51 panels carry a photograph.** All but one are **CC0 1.0** or **public domain**, and
-each record's licence field is reproduced below rather than inferred from a
-search result.
+**All 51 panels carry a photograph.** Forty-eight are **CC0** or **public
+domain** and require no attribution; three are Creative Commons licences that
+do, and they are credited on the game's final screen as well as here:
 
-**The exception is the glass of milk**, which is **CC BY 2.0** by NIAID. CC BY
-requires attribution, so unlike the rest it is credited on the game's final
-screen as well as here. Anyone swapping it for a CC0 photograph can delete that
-clause from the credit line.
-Attribution is not legally required for the CC0 ones; it is given anyway.
+| panel | licence | credit |
+|---|---|---|
+| Milk | CC BY 2.0 | NIAID |
+| Lentils | CC BY 2.0 | Vegan Photo |
+| Cheddar | **CC BY-NC-SA 2.0** | Choo Yut Shing |
 
-Sourced through [Openverse](https://openverse.org/), which aggregates StockSnap,
-Rawpixel, Wikimedia Commons and others. Unsplash, Pexels and Pixabay were not
-used: their images are free to use but are **not** public domain, and each
-carries its own conditions that would have to be re-checked every time this app
-is copied or reused.
+**The cheddar carries the only restrictive licence in the project.**
+*NonCommercial* is satisfied: this is a free teaching page. *ShareAlike* matters
+because every photograph is cropped and brightened at build time, which makes
+the version in the app an adaptation, so that adapted image stays under
+CC BY-NC-SA 2.0. Replacing it with a CC0 or CC BY photograph would remove the
+only obligation attached to this app; nothing else here constrains reuse.
 
-**Cheddar and Lentils have no photograph** and fall back to the flat colour of their food group.
-That is a supported state, not a missing asset — but they are the obvious place
-to improve the set, and dropping a file named after the food into `photos/` and
-re-running `embed_photos.py` is all it takes.
+Each licence below is the field reported by the hosting API or the photo page,
+not an inference from a search result.
 
 | panel | photograph | creator | source | licence |
 |---|---|---|---|---|
@@ -38,6 +37,7 @@ re-running `embed_photos.py` is all it takes.
 | Butter | [Butter and Knive (cropped)](https://commons.wikimedia.org/w/index.php?curid=138043557) | Julikalucky | wikimedia | CC0 |
 | Milk | [Glass of Milk (33657535532).jpg](https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg) | NIAID | wikimedia | CC BY 2.0 |
 | Beer | [Beer Glass](https://stocksnap.io/photo/beer-glass-EWO2FJILM1) | Tim Savage | stocksnap | CC0 |
+| Cheddar | [Cheddar Cheese](https://www.flickr.com/photos/25802865@N08/51404871261) | Choo Yut Shing | flickr | CC BY-NC-SA 2.0 |
 | Mozzarella | [Food at Tokyu Plaza Célavi (17128).jpg](https://commons.wikimedia.org/wiki/File:Food_at_Tokyu_Plaza_C%C3%A9lavi_(17128).jpg) | Syced | wikimedia | CC0 |
 | Olive oil | [Olive oil bottles](https://www.rawpixel.com/image/6037430/photo-image-public-domain-free-olive) | not stated | rawpixel | CC0 |
 | Greek yogurt | [Yogurt Granola](https://stocksnap.io/photo/yogurt-granola-ELZKUZYJK0) | Daria Nepriakhina | stocksnap | CC0 |
@@ -50,6 +50,7 @@ re-running `embed_photos.py` is all it takes.
 | Potatoes | [Free top view raw potato](https://www.rawpixel.com/image/5910137/image-public-domain-plant-nature) | not stated | rawpixel | CC0 |
 | Tofu | [Home-madeTofu.JPG](https://commons.wikimedia.org/wiki/File:Home-madeTofu.JPG) | Grill-Britt | wikimedia | PUBLIC DOMAIN |
 | Salmon | [Raw salmon fillets](https://commons.wikimedia.org/w/index.php?curid=77589496) | FULVIO_TOGNON | wikimedia | CC0 |
+| Lentils | [Lentils legumes beans](https://www.flickr.com/photos/141397992@N02/27323245771) | Vegan Photo | flickr | CC BY 2.0 |
 | Rice | [Short white rice grains are displayed in bulk at a hypermarket in Kozhikode. The smooth, polished grains are a common rice variety used in Kerala homes for breakfasts like dosa and idli.](https://wordpress.org/photos/photo/37069274da/) | Bigul Malayi | wordpress | CC0 |
 | Chicken breast | [Free raw chicken be cooked](https://www.rawpixel.com/image/5925270/photo-image-public-domain-food-branch) | not stated | rawpixel | CC0 |
 | Egg | [Breakfast Eggs](https://stocksnap.io/photo/breakfast-eggs-CUVJE0OSPR) | Krzysztof%20Puszczy%u0144ski | stocksnap | CC0 |
