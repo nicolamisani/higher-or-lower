@@ -187,8 +187,7 @@ body{
 .panel.challenger{padding-top:2.2rem}
 /* the challenger carries a name, a placeholder and two buttons in one half,
    so its placeholder is set small - the buttons already ask the question */
-.panel.challenger .qmark{font-size:clamp(1.8rem,8vw,2.8rem)}
-.panel.challenger .serve{margin-top:.35rem}
+.panel.challenger .panel.challenger .serve{margin-top:.35rem}
 .panel.challenger .calls{margin-top:.8rem}
 
 .name{
@@ -200,8 +199,12 @@ body{
   text-shadow:0 2px 14px rgba(0,0,0,.4);
 }
 .note{
-  font-size:.74rem;color:var(--ink-dim);margin-top:.3rem;
-  letter-spacing:.04em;max-width:26ch;
+  /* this is the question being asked, so it is set no quieter than the
+     serving line above it */
+  font-size:clamp(1rem,4.6vw,1.35rem);line-height:1.25;
+  color:var(--ink);opacity:.96;font-weight:500;
+  margin-top:.75rem;max-width:22ch;
+  text-shadow:0 1px 10px rgba(0,0,0,.45);
 }
 .serve{
   /* this is the information the whole game turns on, so it is sized to be
@@ -232,12 +235,6 @@ body{
   transition:opacity .4s ease .35s, transform .4s ease .35s;
 }
 .why.on{opacity:.92;transform:none}
-
-/* the question mark the challenger wears until it is answered */
-.qmark{
-  font-family:var(--display);font-weight:700;
-  font-size:clamp(3rem,17vw,5.6rem);line-height:.92;color:var(--ink-faint);
-}
 
 /* ---------- the two buttons ---------- */
 .calls{display:flex;flex-direction:column;gap:.6rem;margin-top:1.15rem;width:min(17rem,84vw)}
@@ -320,12 +317,12 @@ body{
 /* short viewports (landscape phones) — keep a panel's content inside its half */
 @media (max-height:560px){
   .name{font-size:clamp(1.1rem,4.4vh,1.6rem);max-width:22ch}
-  .figure,.qmark{font-size:clamp(2rem,9vh,3.2rem)}
+  .figure{font-size:clamp(2rem,9vh,3.2rem)}
   .serve{margin-top:.3rem;font-size:clamp(.85rem,3.4vh,1.05rem)}
   .calls{margin-top:.6rem;gap:.4rem}
   .call{padding:.55rem 1rem;font-size:1.12rem}
   .why{font-size:.72rem;margin-top:.5rem}
-  .note{font-size:.68rem}
+  .note{font-size:clamp(.85rem,3.4vh,1.05rem);margin-top:.45rem}
   #seam{width:2.6rem;height:2.6rem;font-size:.85rem}
   .panel.challenger{padding-top:1.9rem}
 }
@@ -978,7 +975,6 @@ function build(){
       '<p class="serve">' + esc(it.serve) + ' <span>' + esc(it.p) + '</span></p>' +
       (i === 0 ? '' : '<p class="note" id="n' + i + '" hidden></p>') +
       '<div class="figure" id="f' + i + '" hidden>0</div>' +
-      '<div class="qmark" id="q' + i + '" hidden>?</div>' +
       '<div class="unit" id="u' + i + '" hidden>g CO₂e</div>' +
       '<div class="calls" id="c' + i + '" hidden>' +
         '<button class="call" type="button" data-dir="up">' + CHEV_UP + 'Higher</button>' +
@@ -1010,7 +1006,6 @@ function slide(animate){
 /* reveal a panel's figure. instant=true skips the count-up */
 function reveal(i, instant){
   var target = shown(DECK[i]);
-  g('q' + i).hidden = true;
   g('f' + i).hidden = false;
   g('u' + i).hidden = false;
   var el = g('f' + i);
@@ -1034,7 +1029,6 @@ function arm(){
   var was = stack.querySelector('.panel.challenger');
   if (was) was.classList.remove('challenger');
   g('p' + i).classList.add('challenger');
-  g('q' + i).hidden = false;
   g('c' + i).hidden = false;
   g('n' + i).hidden = false;
   g('n' + i).textContent = 'higher or lower than ' + DECK[round].name.toLowerCase() + '?';
