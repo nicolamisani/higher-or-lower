@@ -2,7 +2,7 @@
 
 ## Photographs
 
-**48 of the 51 panels carry a photograph.** Every one is **CC0 1.0** or
+**47 of the 51 panels carry a photograph.** Every one is **CC0 1.0** or
 **public domain**: the licence filter was applied at the API, and each record's
 licence field is reproduced below rather than inferred from a search result.
 Attribution is not legally required for any of them; it is given anyway.
@@ -13,7 +13,7 @@ used: their images are free to use but are **not** public domain, and each
 carries its own conditions that would have to be re-checked every time this app
 is copied or reused.
 
-**Butter, Cheddar, Lentils have no photograph** and fall back to the flat colour of their food group.
+**Milk, Butter, Cheddar, Lentils have no photograph** and fall back to the flat colour of their food group.
 That is a supported state, not a missing asset — but they are the obvious place
 to improve the set, and dropping a file named after the food into `photos/` and
 re-running `embed_photos.py` is all it takes.
@@ -30,7 +30,6 @@ re-running `embed_photos.py` is all it takes.
 | Gin | [Gin Cocktail](https://stocksnap.io/photo/gin-cocktail-KAA9DF2J9I) | Toni Cuenca | stocksnap | CC0 |
 | Red wine | [Red Wine](https://stocksnap.io/photo/red-wine-3T4TRK0WXS) | Jamie Street | stocksnap | CC0 |
 | Beer | [Beer Glass](https://stocksnap.io/photo/beer-glass-EWO2FJILM1) | Tim Savage | stocksnap | CC0 |
-| Milk | [Cutting chai, a Glass of milk tea.](https://wordpress.org/photos/photo/2265bde3f0/) | Amit Kumar Singh | wordpress | CC0 |
 | Mozzarella | [Mozzarella and fresh tomatoes starter](https://www.rawpixel.com/image/432611/free-photo-image-tomatoes-mozzarella-cc0-creative-commons) | Markus Spiske | rawpixel | CC0 |
 | Greek yogurt | [Yogurt Granola](https://stocksnap.io/photo/yogurt-granola-ELZKUZYJK0) | Daria Nepriakhina | stocksnap | CC0 |
 | Olive oil | [Olive oil bottles](https://www.rawpixel.com/image/6037430/photo-image-public-domain-free-olive) | not stated | rawpixel | CC0 |
@@ -44,7 +43,7 @@ re-running `embed_photos.py` is all it takes.
 | Pasta | [Pasta Flour](https://stocksnap.io/photo/pasta-flour-I4MIIMHZ5M) | Jorge Zapata | stocksnap | CC0 |
 | Potatoes | [Free top view raw potato](https://www.rawpixel.com/image/5910137/image-public-domain-plant-nature) | not stated | rawpixel | CC0 |
 | Tofu | [Free tofu dish image](https://www.rawpixel.com/image/5904255/photo-image-background-public-domain-table) | not stated | rawpixel | CC0 |
-| Egg | [Breakfast Eggs](https://stocksnap.io/photo/breakfast-eggs-CUVJE0OSPR) | Krzysztof Puszczyński | stocksnap | CC0 |
+| Egg | [Breakfast Eggs](https://stocksnap.io/photo/breakfast-eggs-CUVJE0OSPR) | Krzysztof%20Puszczy%u0144ski | stocksnap | CC0 |
 | Chicken breast | [Free raw chicken be cooked](https://www.rawpixel.com/image/5925270/photo-image-public-domain-food-branch) | not stated | rawpixel | CC0 |
 | Pork chop | [Raw meat](https://www.rawpixel.com/image/5905578/raw-meat-free-public-domain-cc0-photo) | not stated | rawpixel | CC0 |
 | Pork sausage | [Sausages Barbecue](https://stocksnap.io/photo/sausages-barbecue-NJ5IKKFZ55) | The Digital Marketing Collaboration | stocksnap | CC0 |
