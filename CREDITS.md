@@ -29,7 +29,7 @@ not an inference from a search result.
 | Lamb leg | [Free lamb ribs image](https://www.rawpixel.com/image/5928207/free-lamb-ribs-image-public-domain-cc0-photo) | not stated | rawpixel | CC0 |
 | Prawns | [Free delicious prawns image](https://www.rawpixel.com/image/5917267/image-public-domain-food-free) | not stated | rawpixel | CC0 |
 | Lettuce | [A head of green lettuce growing in soil with visible dirt clumps around it.](https://wordpress.org/photos/photo/13967d4152/) | Yam B Chhetri | wordpress | CC0 |
-| Tea | [Cup Mug](https://stocksnap.io/photo/cup-mug-884KIHU30I) | Pawel Kadysz | stocksnap | CC0 |
+| Tea | [Afternoon black tea white teapot](https://www.rawpixel.com/image/448029/free-photo-image-tea-black-glass) | Jakub Kapusnak | rawpixel | CC0 |
 | Apple | [Red apples fruit bowl](https://www.rawpixel.com/image/6041947/photo-image-public-domain-fruit-red) | not stated | rawpixel | CC0 |
 | Gin | [Gin Cocktail](https://stocksnap.io/photo/gin-cocktail-KAA9DF2J9I) | Toni Cuenca | stocksnap | CC0 |
 | Red wine | [Red Wine](https://stocksnap.io/photo/red-wine-3T4TRK0WXS) | Jamie Street | stocksnap | CC0 |
