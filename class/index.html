@@ -171,9 +171,12 @@ button{touch-action:manipulation}
   color:var(--ink-faint);font-weight:600;margin-top:.2rem}
 .tiebreak{margin:1.6rem 0 0;font-size:.78rem;color:var(--ink-faint);text-align:center}
 
-@media (orientation:landscape) and (max-height:520px){
-  #turn{display:flex!important}
-}
+/* The lock is driven from JS, not from a media query. A media query can only
+   compare the viewport's width with its height, and an on-screen keyboard
+   makes an upright phone measure wider than it is tall — so the old rule
+   covered the check-in screen with "turn your phone upright" exactly when the
+   student was upright, typing the code. */
+#app.sideways #turn{display:flex}
 #turn{display:none;position:absolute;inset:0;z-index:90;background:var(--cream);
   color:var(--seed);flex-direction:column;align-items:center;justify-content:center;
   gap:1rem;text-align:center;padding:0 22px}
@@ -535,6 +538,31 @@ function drawPodium(p){
       <div class="who">${esc(t.name)}</div><div class="pc">${t.pct}%</div></div>`;
   }).join('');
   $('avg').textContent = (p.avg != null ? p.avg : 0) + '%';
+}
+
+// ---------------------------------------------------------------------------
+// Portrait lock. Landscape halves are about 180px tall and the lower button
+// falls off the panel, so the game is portrait only — but the test has to be
+// the device's real orientation, which a keyboard cannot change.
+// ---------------------------------------------------------------------------
+function sideways(o){
+  // o is injected by the self-test below; in the page it comes from the device.
+  const angle = o ? o.angle : (screen.orientation && typeof screen.orientation.angle === 'number'
+      ? screen.orientation.angle
+      : (typeof window.orientation === 'number' ? window.orientation : 0));
+  const height = o ? o.height : window.innerHeight;
+  const phone  = o ? o.phone  : matchMedia('(pointer: coarse)').matches;
+  // Only a phone, only genuinely turned on its side, and only when there is
+  // too little height to play. A laptop in a short window is never told to
+  // turn itself upright.
+  return phone && (Math.abs(angle) === 90 || Math.abs(angle) === 270) && height < 520;
+}
+function lock(){ $('app').classList.toggle('sideways', sideways()); }
+lock();
+addEventListener('resize', lock);
+addEventListener('orientationchange', lock);
+if (screen.orientation && screen.orientation.addEventListener) {
+  screen.orientation.addEventListener('change', lock);
 }
 
 // A phone that sleeps and wakes rejoins at whatever card the room is on.
