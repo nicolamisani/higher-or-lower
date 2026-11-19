@@ -446,6 +446,19 @@ function panel(food, revealed, challenger, prev){
   return `<section class="panel${revealed && challenger ? ' shown' : ''}" style="${style}">${inner}</section>`;
 }
 
+// Coming back after a reload, the card the student was on may already be
+// answered. Put it back as a solution rather than asking it again.
+function resumeCard(){
+  if (answers[round] != null) {
+    drawCard(true);
+    const ok = answers[round] === rightFor(round);
+    $('seam').className = ok ? 'right' : 'wrong';
+    $('seam').innerHTML = ok ? TICK : CROSS;
+  } else {
+    drawCard(false);
+  }
+}
+
 let open = false;              // is the solution on screen, waiting for Next
 function drawCard(revealed){
   const top = DECK[round], bottom = DECK[round + 1];
@@ -471,7 +484,7 @@ function drawCard(revealed){
 $('s-board').addEventListener('click', () => { if (open) next(); });
 
 async function answer(dir){
-  if (busy) return;
+  if (busy || answers[round] != null) return;   // never score one card twice
   busy = true;
   answers[round] = dir;
   spentMs += shownAt ? Math.round(performance.now() - shownAt) : 0;
@@ -553,16 +566,36 @@ $('join').onclick = async () => {
     if (!d || d.game !== 'lca-hol') throw new Error('That code does not match a game.');
     if (d.stage === 'closed') throw new Error('Check-in is not open yet.');
     me = fs.doc(db, `sessions/${code}/groups/${uid}`);
+
+    // A phone that reloads mid-game keeps the same anonymous identity, so its
+    // document is still there. Pick the game back up instead of starting it
+    // over: writing a blank document here used to cost a student everything
+    // they had answered, and reloads are common on a shared classroom wifi.
+    const mine = await fs.getDoc(me);
+    const had = mine.exists() ? mine.data() : null;
+    const resuming = !!(had && (had.done || Object.keys(had.answers || {}).length));
+    if (resuming) {
+      Object.assign(answers, had.answers || {});
+      correct = had.correct || 0;
+      spentMs = had.spentMs || 0;
+      round = had.at || 0;
+      finished = !!had.done;
+    }
+
     // The Firestore rules this project already runs demand all three of these
     // on every write: the document must name its owner, must not be submitted,
     // and a student may never write a score. Omitting any one of them fails
     // with "Missing or insufficient permissions" and nothing else.
-    await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null,
-                          name, ready: false, answers: {}, correct: 0,
-                          at: 0, done: false, joinedAt: Date.now() }, { merge: true });
+    await fs.setDoc(me, resuming
+      ? { ownerUid: uid, submitted: false, score: null, name, ready: true }
+      : { ownerUid: uid, submitted: false, score: null, name, ready: false,
+          answers: {}, correct: 0, at: 0, done: false, joinedAt: Date.now() },
+      { merge: true });
+
     try { localStorage.setItem('hol_class', JSON.stringify({ code, name })); } catch (e) {}
     watch(code);
-    show('s-rules');
+    // Someone picking up a game in progress does not need the rules again.
+    if (resuming) { paintScore(); render(); } else { show('s-rules'); }
   } catch (e) {
     $('joinerr').textContent = e.message || 'Could not join.';
     $('join').disabled = false;
@@ -594,7 +627,7 @@ function render(){
     if (finished) { show('s-done'); return; }
     // Entering the board is one-way: a re-delivered snapshot must never throw
     // a student back to the first card.
-    if ($('s-board').hidden) { show('s-board'); drawCard(false); paintScore(); }
+    if ($('s-board').hidden) { show('s-board'); resumeCard(); paintScore(); }
   } else if (d.stage === 'ranking') {
     drawRanking(); show('s-final');
   } else if (d.stage === 'podium') {
