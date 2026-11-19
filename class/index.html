@@ -45,7 +45,15 @@ button{touch-action:manipulation}
   padding-left:max(20px,env(safe-area-inset-left,0px));
   padding-right:max(20px,env(safe-area-inset-right,0px));}
 .screen > .body{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;
-  display:flex;flex-direction:column;align-items:center;justify-content:center}
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  /* Windows draws a wide, pale scrollbar that glares against the dark board.
+     Thin it and tint it to the screen it sits on. */
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+.screen.pale > .body{scrollbar-color:rgba(21,23,15,.2) transparent}
+.screen > .body::-webkit-scrollbar{width:6px}
+.screen > .body::-webkit-scrollbar-track{background:transparent}
+.screen > .body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:99px}
+.screen.pale > .body::-webkit-scrollbar-thumb{background:rgba(21,23,15,.2)}
 @supports (justify-content: safe center){ .screen > .body{justify-content:safe center} }
 .pale{background:var(--cream);color:var(--seed)}
 
