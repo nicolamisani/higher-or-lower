@@ -189,15 +189,29 @@ button{touch-action:manipulation}
 .ladder .nm i::before{content:", "}
 .ladder .vl{font-family:var(--display);font-weight:700;font-size:1rem;
   font-variant-numeric:tabular-nums}
-.steps{display:flex;align-items:flex-end;gap:.6rem;margin-top:1.6rem}
-.step{background:rgba(255,255,255,.1);border-radius:10px 10px 0 0;padding:.7rem .5rem .6rem;
-  width:min(6.4rem,27vw);text-align:center}
-.step .pos{font-family:var(--display);font-weight:700;font-size:1.5rem;color:var(--ink-faint)}
-.step .who{font-size:.8rem;font-weight:600;line-height:1.25;margin-top:.2rem;
-  overflow-wrap:anywhere}
-.step .pc{font-family:var(--display);font-weight:700;font-size:1.3rem;margin-top:.25rem}
-.step.p1{height:9.5rem;background:rgba(168,210,159,.22)}
-.step.p2{height:7.8rem} .step.p3{height:6.6rem}
+/* The podium, in the same shape as Peak ESG's: second on the left, first in
+   the middle, third on the right, each rising as it appears. Cream, so the
+   game ends on the colour it opened with. */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:.45rem;
+  margin:1.5rem 0 .2rem;width:min(21rem,92vw)}
+.plinth{flex:1;max-width:7rem;display:flex;flex-direction:column;align-items:center;
+  animation:rise .55s cubic-bezier(.2,.9,.3,1.2) both}
+.plinth.p1{animation-delay:.28s} .plinth.p2{animation-delay:.14s}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){ .plinth{animation:none} }
+.plinth .medal{font-size:1.45rem;line-height:1;margin-bottom:.15rem}
+.plinth .who{font-size:.82rem;font-weight:700;text-align:center;line-height:1.25;
+  overflow-wrap:anywhere;color:var(--seed)}
+.plinth .pc{font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1;
+  margin:.2rem 0 .4rem;color:var(--seed)}
+.plinth .block{width:100%;border-radius:9px 9px 0 0;display:flex;align-items:flex-start;
+  justify-content:center;padding-top:.35rem;font-family:var(--display);font-weight:700;
+  font-size:1.35rem;color:rgba(255,255,255,.78)}
+.plinth.p1 .block{height:6.4rem;background:linear-gradient(180deg,#f0c04a,#b78a1d)}
+.plinth.p2 .block{height:4.8rem;background:linear-gradient(180deg,#cfd8e0,#8a97a3)}
+.plinth.p3 .block{height:3.6rem;background:linear-gradient(180deg,#cd9163,#8d5f3c)}
+.thanks{margin:1.9rem 0 0;font-family:var(--display);text-transform:uppercase;
+  letter-spacing:.17em;font-weight:600;font-size:.9rem;color:rgba(21,23,15,.62)}
 .avg{margin-top:1.8rem;text-align:center}
 .avg .n{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1}
 #veil{position:absolute;inset:0;z-index:70;background:rgba(7,8,6,.93);
@@ -208,7 +222,9 @@ button{touch-action:manipulation}
 #veil p{margin:0;color:var(--ink-dim);font-size:.95rem;max-width:22ch;line-height:1.5}
 .avg .l{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink-faint);font-weight:600;margin-top:.2rem}
-.tiebreak{margin:1.6rem 0 0;font-size:.78rem;color:var(--ink-faint);text-align:center}
+.tiebreak{margin:1.5rem 0 0;font-size:.78rem;color:var(--ink-faint);text-align:center}
+#s-podium .kicker,#s-podium .avg .l,#s-podium .tiebreak{color:rgba(21,23,15,.5)}
+#s-podium .avg .n{color:var(--seed)}
 
 </style>
 </head>
@@ -296,13 +312,15 @@ button{touch-action:manipulation}
   </section>
 
   <!-- 6 · the podium -->
-  <section class="screen" id="s-podium" hidden>
+  <section class="screen pale" id="s-podium" hidden>
    <div class="body">
     <p class="kicker">The class</p>
-    <div class="steps" id="steps"></div>
+    <div class="podium" id="steps"></div>
     <div class="avg"><div class="n" id="avg">&ndash;</div><div class="l">class average</div></div>
     <p class="tiebreak">Ties are broken by how fast you answered.</p>
+    <p class="thanks">Thanks for playing</p>
    </div>
+    <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
   </section>
 
 </div>
@@ -586,12 +604,16 @@ function render(){
   }
 }
 
+const MEDAL = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
 function drawPodium(p){
-  const order = [1,0,2];                       // second, first, third
+  const order = [1, 0, 2];                     // second, first, third
   $('steps').innerHTML = order.filter(i => p.top && p.top[i]).map(i => {
     const t = p.top[i];
-    return `<div class="step p${i+1}"><div class="pos">${i+1}</div>
-      <div class="who">${esc(t.name)}</div><div class="pc">${t.pct}%</div></div>`;
+    return `<div class="plinth p${i+1}">
+      <div class="medal">${MEDAL[i]}</div>
+      <div class="who">${esc(t.name)}</div>
+      <div class="pc">${t.pct}%</div>
+      <div class="block">${i+1}</div></div>`;
   }).join('');
   $('avg').textContent = (p.avg != null ? p.avg : 0) + '%';
 }
