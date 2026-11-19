@@ -81,6 +81,11 @@ button{touch-action:manipulation}
 .cta:disabled{opacity:.4;cursor:not-allowed}
 .pitch{margin:1.5rem 0 .2rem;max-width:27ch;text-align:center;
   font-size:clamp(.95rem,4.1vw,1.08rem);line-height:1.5;color:rgba(21,23,15,.78)}
+/* While a field has focus the soft keyboard owns the bottom half of the
+   screen, and the mark and the pitch push the two boxes out of sight — the
+   student has to scroll to type the code they were just given. Fold away what
+   they are not using until they are done typing. */
+#s-join.typing .logo,#s-join.typing .pitch{display:none}
 .err{margin:.75rem 0 0;color:#9a3b36;font-size:.9rem;font-weight:600;min-height:1.2em}
 .rules{max-width:30ch;display:flex;flex-direction:column;gap:1.5rem}
 .rules p{margin:0;font-size:clamp(.98rem,4.2vw,1.1rem);line-height:1.52;
@@ -572,6 +577,11 @@ const canJoin = () => $('code').value.trim().length === 4 && $('name').value.tri
 const refresh = () => { $('join').disabled = !canJoin(); };
 $('code').addEventListener('input', refresh);
 $('name').addEventListener('input', refresh);
+
+$('s-join').addEventListener('focusin', () => $('s-join').classList.add('typing'));
+$('s-join').addEventListener('focusout', () => setTimeout(() => {
+  if (!$('s-join').contains(document.activeElement)) $('s-join').classList.remove('typing');
+}, 60));
 
 $('join').onclick = async () => {
   const code = $('code').value.trim(), name = $('name').value.trim();
