@@ -30,11 +30,12 @@ button{touch-action:manipulation}
 
 #app{position:relative;height:100%;overflow:hidden}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;overflow-y:auto;
-  padding-block:1.5rem 4.2rem;
+  padding-block:1.1rem .8rem;
   padding-left:max(20px,env(safe-area-inset-left,0px));
   padding-right:max(20px,env(safe-area-inset-right,0px));}
-@supports (justify-content: safe center){ .screen{justify-content:safe center} }
+.screen > .body{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+@supports (justify-content: safe center){ .screen > .body{justify-content:safe center} }
 .pale{background:var(--cream);color:var(--seed)}
 
 /* ---------- the mark ---------- */
@@ -47,7 +48,7 @@ button{touch-action:manipulation}
 .logo b{font-weight:700;font-style:normal}
 
 /* ---------- forms and buttons ---------- */
-.field{width:min(20rem,86vw);margin-top:1.5rem}
+.field{width:min(20rem,86vw);margin-top:1.15rem}
 .field label{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
   font-weight:700;color:rgba(21,23,15,.55);margin-bottom:.35rem}
 .field input{width:100%;font:inherit;font-size:1.05rem;padding:.7rem .9rem;
@@ -55,17 +56,18 @@ button{touch-action:manipulation}
   color:var(--seed);user-select:text;-webkit-user-select:text}
 .field input:focus{outline:3px solid rgba(21,23,15,.35);outline-offset:1px}
 #code{letter-spacing:.3em;font-weight:700;text-align:center}
-.cta{margin-top:1.6rem;appearance:none;border:0;cursor:pointer;border-radius:999px;
+.cta{margin-top:1.35rem;appearance:none;border:0;cursor:pointer;border-radius:999px;
   background:var(--seed);color:var(--cream);font-family:var(--body);font-weight:600;
   font-size:1.02rem;letter-spacing:.015em;padding:.78rem 2.6rem}
 .cta:disabled{opacity:.4;cursor:not-allowed}
-.pitch{margin:2.2rem 0 0;max-width:27ch;text-align:center;
+.pitch{margin:1.5rem 0 .2rem;max-width:27ch;text-align:center;
   font-size:clamp(.95rem,4.1vw,1.08rem);line-height:1.5;color:rgba(21,23,15,.78)}
-.err{margin:.9rem 0 0;color:#9a3b36;font-size:.9rem;font-weight:600;min-height:1.2em}
+.err{margin:.75rem 0 0;color:#9a3b36;font-size:.9rem;font-weight:600;min-height:1.2em}
 .rules{max-width:30ch;display:flex;flex-direction:column;gap:1.8rem}
 .rules p{margin:0;font-size:clamp(.98rem,4.2vw,1.1rem);line-height:1.52;
   color:rgba(21,23,15,.82)}
-.foot{position:absolute;left:0;right:0;bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));
+.foot{flex:none;margin:0;padding-top:.85rem;
+  padding-bottom:env(safe-area-inset-bottom,0px);
   text-align:center;font-size:.64rem;line-height:1.55;letter-spacing:.1em;
   text-transform:uppercase;font-weight:600;color:rgba(21,23,15,.5)}
 .waitline{margin-top:2.2rem;font-size:1.02rem;color:rgba(21,23,15,.72);max-width:22ch;
@@ -192,22 +194,27 @@ button{touch-action:manipulation}
 
   <!-- 1 · check in -->
   <section class="screen pale" id="s-join">
+   <div class="body">
     <div class="logo" id="logo1"></div>
+    <p class="pitch">Which is worse? Wine or beer? Tofu or lentils?
+      Compare the carbon emissions of the food and drink you have every day.</p>
     <div class="field">
       <label for="code">Code from the screen</label>
       <input id="code" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="0000">
     </div>
     <div class="field">
       <label for="name">Your name</label>
-      <input id="name" autocomplete="off" maxlength="60" placeholder="Name, or both names">
+      <input id="name" autocomplete="off" maxlength="60" placeholder="a recognizable name, or names">
     </div>
     <p class="err" id="joinerr"></p>
     <button class="cta" id="join" disabled>I&rsquo;m in</button>
+   </div>
     <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
   </section>
 
   <!-- 2 · the rules -->
   <section class="screen pale" id="s-rules" hidden>
+   <div class="body">
     <div class="rules">
       <p>For each pair of foods or drinks, say which one carries the higher
         total emissions, measured in grams of CO<sub>2</sub> equivalent.</p>
@@ -218,13 +225,16 @@ button{touch-action:manipulation}
       <p style="font-weight:600">You have 15 seconds for each pair.</p>
     </div>
     <button class="cta" id="ready">I&rsquo;m ready</button>
+   </div>
     <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
   </section>
 
   <!-- 3 · waiting -->
   <section class="screen pale" id="s-wait" hidden>
+   <div class="body">
     <div class="logo" id="logo2"></div>
     <p class="waitline">Wait for the instructor to start the game.</p>
+   </div>
     <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
   </section>
 
@@ -237,19 +247,23 @@ button{touch-action:manipulation}
 
   <!-- 5 · your score and the ranking -->
   <section class="screen" id="s-final" hidden>
+   <div class="body">
     <p class="kicker">You scored</p>
     <p class="big" id="finalpct">&ndash;</p>
     <p class="subline" id="finalsub"></p>
     <p class="ladder-head">grams of CO&#8322;e per serving</p>
     <ol class="ladder" id="ladder"></ol>
+   </div>
   </section>
 
   <!-- 6 · the podium -->
   <section class="screen" id="s-podium" hidden>
+   <div class="body">
     <p class="kicker">The class</p>
     <div class="steps" id="steps"></div>
     <div class="avg"><div class="n" id="avg">&ndash;</div><div class="l">class average</div></div>
     <p class="tiebreak">Ties are broken by how fast you answered.</p>
+   </div>
   </section>
 
 </div>
@@ -277,9 +291,9 @@ function head(dir, w, fill){
   return `<svg viewBox="0 0 ${w} ${h}" width="${w}" aria-hidden="true"><path d="M${
     pts.map(q=>q.join(' ')).join(' L')} Z" fill="${fill}" stroke="${fill}" stroke-width="${r*2}" stroke-linejoin="round"/></svg>`;
 }
-function buildLogo(box){
+function buildLogo(box, cap){
   if (!box) return;
-  const w = Math.min(210, Math.round(window.innerWidth * 0.58));
+  const w = Math.min(cap || 210, Math.round(window.innerWidth * 0.58));
   const size = Math.round(w * 0.227);
   box.innerHTML = head('up', w, 'var(--berry)') +
     `<div class="words" style="font-size:${size}px;margin:${Math.round(w*0.068)}px 0">
@@ -296,8 +310,10 @@ function buildLogo(box){
   Promise.all([`300 ${size}px "Barlow Condensed"`, `700 ${size}px "Barlow Condensed"`]
     .map(f => document.fonts.load(f))).then(() => requestAnimationFrame(fit));
 }
-buildLogo($('logo1')); buildLogo($('logo2'));
-addEventListener('resize', () => { buildLogo($('logo1')); buildLogo($('logo2')); });
+// The check-in screen carries the pitch and two fields as well, so its mark
+// is smaller than the waiting screen's.
+const marks = () => { buildLogo($('logo1'), 160); buildLogo($('logo2'), 210); };
+marks(); addEventListener('resize', marks);
 
 // ---------------------------------------------------------------------------
 // Scoring, local. Nobody is told anyone else's score before the podium.
