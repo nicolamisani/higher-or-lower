@@ -138,18 +138,30 @@ button{touch-action:manipulation}
    short window it pushed Next off the bottom and drove the food's name up
    behind the seam. So the solution panel takes the larger share of the board,
    starts below the seam instead of centring into it, and sets tighter type. */
-#s-board.revealed .panel:first-child{flex:0 1 34%}
-#s-board.revealed .panel:last-child{flex:1 1 66%}
-/* the seam marks the boundary between the two panels, so it has to move with
-   it — left at 50% it floats inside the solution panel and sits on the name */
-#s-board.revealed #seam{top:34%}
+/* The two panels pull opposite ways when the solution is up: the longest
+   explanation (tea, 198 characters) wants the lower panel large, while the
+   upper panel still has to fit a name, a serving, a figure and its unit
+   without the seam landing on them. 40/60 serves both; 34/66 clipped the
+   unit on a short laptop window. */
+#s-board.revealed .panel:first-child{flex:0 1 40%}
+#s-board.revealed .panel:last-child{flex:1 1 60%}
+/* the seam marks the boundary between the panels, so it moves with it —
+   left at 50% it floats inside the solution panel and sits on the name */
+#s-board.revealed #seam{top:40%}
+/* the top card is known by now, so it gives up room rather than being cut */
+#s-board.revealed .panel:first-child .name{font-size:clamp(1.05rem,5vw,1.55rem)}
+#s-board.revealed .panel:first-child .serve{font-size:clamp(.82rem,3.6vw,.95rem);
+  margin-top:.1rem}
+#s-board.revealed .panel:first-child .unit{margin-top:.1rem}
+#s-board.revealed .panel:first-child{padding-bottom:1.5rem}
 .panel.shown{justify-content:flex-start;padding-top:1.9rem}
 .panel.shown .figure{font-size:clamp(1.7rem,8vw,2.6rem);margin-top:.25rem}
 .panel.shown .name{font-size:clamp(1.1rem,5.2vw,1.7rem)}
 .panel.shown .why{font-size:.74rem;line-height:1.3;margin-top:.4rem;max-width:32ch}
 .panel.shown .calls{margin-top:.55rem}
 /* the top panel is already known by now, so it can give up room */
-#s-board.revealed .panel:first-child .figure{font-size:clamp(1.5rem,7vw,2.2rem)}
+#s-board.revealed .panel:first-child .figure{font-size:clamp(1.45rem,6.6vw,2.1rem);
+  margin-top:.15rem}
 .call svg{width:.78em;height:.78em;flex:none;stroke-width:3.4}
 #seam{position:absolute;top:50%;left:50%;z-index:25;transform:translate(-50%,-50%);
   width:3rem;height:3rem;border-radius:50%;background:#fff;color:#111;display:grid;
@@ -210,8 +222,12 @@ button{touch-action:manipulation}
 .plinth.p1 .block{height:6.4rem;background:linear-gradient(180deg,#f0c04a,#b78a1d)}
 .plinth.p2 .block{height:4.8rem;background:linear-gradient(180deg,#cfd8e0,#8a97a3)}
 .plinth.p3 .block{height:3.6rem;background:linear-gradient(180deg,#cd9163,#8d5f3c)}
+.podium-title{margin:0;font-family:var(--display);font-weight:700;
+  text-transform:uppercase;font-size:clamp(2.1rem,10.5vw,3rem);line-height:1;
+  letter-spacing:.05em;color:var(--seed)}
 .thanks{margin:1.9rem 0 0;font-family:var(--display);text-transform:uppercase;
-  letter-spacing:.17em;font-weight:600;font-size:.9rem;color:rgba(21,23,15,.62)}
+  letter-spacing:.14em;font-weight:700;font-size:clamp(1.2rem,5.8vw,1.55rem);
+  color:rgba(21,23,15,.72)}
 .avg{margin-top:1.8rem;text-align:center}
 .avg .n{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1}
 #veil{position:absolute;inset:0;z-index:70;background:rgba(7,8,6,.93);
@@ -223,7 +239,7 @@ button{touch-action:manipulation}
 .avg .l{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink-faint);font-weight:600;margin-top:.2rem}
 .tiebreak{margin:1.5rem 0 0;font-size:.78rem;color:var(--ink-faint);text-align:center}
-#s-podium .kicker,#s-podium .avg .l,#s-podium .tiebreak{color:rgba(21,23,15,.5)}
+#s-podium .avg .l,#s-podium .tiebreak{color:rgba(21,23,15,.5)}
 #s-podium .avg .n{color:var(--seed)}
 
 </style>
@@ -314,7 +330,7 @@ button{touch-action:manipulation}
   <!-- 6 · the podium -->
   <section class="screen pale" id="s-podium" hidden>
    <div class="body">
-    <p class="kicker">The class</p>
+    <p class="podium-title">Podium</p>
     <div class="podium" id="steps"></div>
     <div class="avg"><div class="n" id="avg">&ndash;</div><div class="l">class average</div></div>
     <p class="tiebreak">Ties are broken by how fast you answered.</p>
