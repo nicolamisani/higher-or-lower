@@ -23,12 +23,23 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
-body{background:var(--shade);color:var(--ink);font-family:var(--body);
+body{background:#070806;color:var(--ink);font-family:var(--body);
      overflow:hidden;-webkit-text-size-adjust:100%;
-     -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+     -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
+     display:flex;align-items:stretch;justify-content:center}
 button{touch-action:manipulation}
 
-#app{position:relative;height:100%;overflow:hidden}
+/* The game is built for a portrait phone, and the photographs are square.
+   Let the board span a wide laptop and `cover` has to magnify a 380px square
+   to a 1100px-wide strip: the picture becomes an unrecognisable blur. Holding
+   the board to a phone-shaped column keeps every panel roughly square, so the
+   photographs read the same on every screen — and the instructor sees what
+   the room sees. */
+#app{position:relative;height:100%;width:100%;max-width:470px;overflow:hidden;
+     background:var(--shade)}
+@media (min-width:500px){
+  #app{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 60px rgba(0,0,0,.6)}
+}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;
   padding-block:1.1rem .8rem;
   padding-left:max(20px,env(safe-area-inset-left,0px));
@@ -63,7 +74,7 @@ button{touch-action:manipulation}
 .pitch{margin:1.5rem 0 .2rem;max-width:27ch;text-align:center;
   font-size:clamp(.95rem,4.1vw,1.08rem);line-height:1.5;color:rgba(21,23,15,.78)}
 .err{margin:.75rem 0 0;color:#9a3b36;font-size:.9rem;font-weight:600;min-height:1.2em}
-.rules{max-width:30ch;display:flex;flex-direction:column;gap:1.25rem}
+.rules{max-width:30ch;display:flex;flex-direction:column;gap:1.5rem}
 .rules p{margin:0;font-size:clamp(.98rem,4.2vw,1.1rem);line-height:1.52;
   color:rgba(21,23,15,.82)}
 .foot{flex:none;margin:0;padding-top:.85rem;
@@ -112,6 +123,14 @@ button{touch-action:manipulation}
 .call:active{transform:scale(.97)}
 .call[aria-pressed="true"]{box-shadow:0 0 0 3px #fff,0 3px 14px rgba(0,0,0,.35)}
 .call:disabled{opacity:.55;cursor:default}
+.call[data-dir="next"]{background:#f4efe3;letter-spacing:.2em}
+/* A revealed panel holds the figure, the explanation and Next, so its type
+   is tighter than a question panel's — otherwise Next falls off a short
+   phone and the student is stuck. */
+.panel.shown .figure{font-size:clamp(1.8rem,9vw,2.9rem)}
+.panel.shown .name{font-size:clamp(1.15rem,5.6vw,1.8rem)}
+.panel.shown .why{font-size:.76rem;margin-top:.35rem}
+.panel.shown .calls{margin-top:.5rem}
 .call svg{width:.78em;height:.78em;flex:none;stroke-width:3.4}
 #seam{position:absolute;top:50%;left:50%;z-index:25;transform:translate(-50%,-50%);
   width:3rem;height:3rem;border-radius:50%;background:#fff;color:#111;display:grid;
@@ -124,15 +143,10 @@ button{touch-action:manipulation}
 
 /* ---------- the clock and the score ---------- */
 #hud{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;
-  justify-content:space-between;align-items:flex-start;
+  justify-content:flex-end;align-items:flex-start;
   padding-top:calc(.65rem + env(safe-area-inset-top,0px));
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));pointer-events:none}
-#clock{font-family:var(--display);font-weight:700;font-size:1.9rem;line-height:1;
-  font-variant-numeric:tabular-nums;background:rgba(0,0,0,.58);border-radius:999px;
-  padding:.12em .5em;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
-#clock.urgent{animation:beat .6s steps(1) infinite}
-@keyframes beat{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
 #score{font-family:var(--display);font-weight:700;font-size:1.7rem;line-height:1;
   font-variant-numeric:tabular-nums;background:rgba(0,0,0,.58);border-radius:999px;
   padding:.16em .5em;box-shadow:0 0 0 1px rgba(255,255,255,.14);transition:color .45s}
@@ -167,6 +181,12 @@ button{touch-action:manipulation}
 .step.p2{height:7.8rem} .step.p3{height:6.6rem}
 .avg{margin-top:1.8rem;text-align:center}
 .avg .n{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1}
+#veil{position:absolute;inset:0;z-index:70;background:rgba(7,8,6,.93);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:.8rem;text-align:center;padding:0 2rem}
+#veil.on{display:flex}
+#veil .big{font-size:clamp(1.6rem,8vw,2.2rem)}
+#veil p{margin:0;color:var(--ink-dim);font-size:.95rem;max-width:22ch;line-height:1.5}
 .avg .l{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink-faint);font-weight:600;margin-top:.2rem}
 .tiebreak{margin:1.6rem 0 0;font-size:.78rem;color:var(--ink-faint);text-align:center}
@@ -207,9 +227,8 @@ button{touch-action:manipulation}
         processing, packaging, transport, the shop, and keeping it at home.</p>
       <p>The answer depends on the food and on the size of the serving.
         Every card shows one serving.</p>
-      <p style="font-weight:600">You have 15 seconds for each pair.</p>
-      <p>Read each solution carefully. The food you have just seen becomes the
-        first of the next pair, which makes the next answer easier to judge.</p>
+      <p style="font-weight:600">Take your time. There is no clock.</p>
+      <p>Read each solution carefully. It makes the next answer easier to judge.</p>
     </div>
     <button class="cta" id="ready">I&rsquo;m ready</button>
    </div>
@@ -227,12 +246,26 @@ button{touch-action:manipulation}
 
   <!-- 4 · the board -->
   <section id="s-board" hidden>
-    <div id="hud"><div id="clock">15</div><div id="score">&ndash;</div></div>
+    <div id="hud"><div id="score">&ndash;</div></div>
     <div id="board"></div>
     <div id="seam">VS</div>
   </section>
 
-  <!-- 5 · your score and the ranking -->
+  <div id="veil"><div class="big" style="font-family:var(--display);font-weight:700">Paused</div>
+    <p>Your place is kept. The game continues when the instructor restarts it.</p></div>
+
+  <!-- 5 · finished, waiting for the rest of the class -->
+  <section class="screen pale" id="s-done" hidden>
+   <div class="body">
+    <p class="kicker" style="color:rgba(21,23,15,.5)">All fifty done</p>
+    <p class="big" id="donepct" style="color:var(--seed)">&ndash;</p>
+    <p class="waitline" style="margin-top:1.2rem">That is the whole deck.
+      Wait for the rest of the class.</p>
+   </div>
+    <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
+  </section>
+
+  <!-- 6 · your score and the ranking -->
   <section class="screen" id="s-final" hidden>
    <div class="body">
     <p class="kicker">You scored</p>
@@ -346,9 +379,13 @@ function paintScore(){
 }
 
 // ---------------------------------------------------------------------------
-// The board. Two panels, redrawn per card: there is no sliding deck here
-// because the server decides which card is on screen.
+// The board. Each student plays at their own pace: the server says only
+// whether the room is playing, paused, on the ranking or on the podium, and
+// none of those expire. Nothing here depends on a card arriving on time.
 // ---------------------------------------------------------------------------
+let round = 0;                 // which comparison this student is on
+let busy = false;
+
 function panel(food, revealed, challenger, prev){
   const g = GROUPS[food.group] || GROUPS.veg;
   const src = PHOTOS[food.name];
@@ -358,73 +395,112 @@ function panel(food, revealed, challenger, prev){
     <p class="serve">${esc(food.serve)} <span>${esc(food.p)}</span></p>`;
   if (revealed) {
     inner += `<div class="figure">${food.g}</div><div class="unit">g CO&#8322;e</div>`;
-    if (challenger) inner += `<p class="why">${esc(food.why)}</p>`;
+    if (challenger) {
+      inner += `<p class="why">${esc(food.why)}</p>
+        <div class="calls"><button class="call" data-dir="next">Next</button></div>`;
+    }
   } else if (challenger) {
     inner += `<p class="serve" style="opacity:.9">higher or lower than ${esc(prev.name.toLowerCase())}?</p>
       <div class="calls">
-        <button class="call" data-dir="up" aria-pressed="false">${CHEV_UP}Higher</button>
-        <button class="call" data-dir="down" aria-pressed="false">${CHEV_DN}Lower</button>
+        <button class="call" data-dir="up">${CHEV_UP}Higher</button>
+        <button class="call" data-dir="down">${CHEV_DN}Lower</button>
       </div>`;
   }
-  return `<section class="panel" style="${style}">${inner}</section>`;
+  return `<section class="panel${revealed && challenger ? ' shown' : ''}" style="${style}">${inner}</section>`;
 }
 
-let drawnKey = '';
-function drawBoard(card, stage){
-  const key = card + '/' + stage;
-  const top = DECK[card], bottom = DECK[card+1];
-  if (key !== drawnKey) {
-    $('board').innerHTML = panel(top, true, false, null)
-                         + panel(bottom, stage === 'answer', true, top);
-    drawnKey = key;
-    if (stage === 'question') {
-      const chosen = answers[card];
-      $('board').querySelectorAll('.call').forEach(b => {
-        if (chosen) { b.disabled = true; b.setAttribute('aria-pressed', String(b.dataset.dir === chosen)); }
-        b.onclick = () => answer(card, b.dataset.dir);
-      });
-      $('seam').className = ''; $('seam').textContent = 'VS';
-      shownAt = performance.now();
-    } else {
-      const given = answers[card];
-      const ok = given === rightFor(card);
-      $('seam').className = given ? (ok ? 'right' : 'wrong') : 'wrong';
-      $('seam').innerHTML = given ? (ok ? TICK : CROSS) : CROSS;
-    }
+let open = false;              // is the solution on screen, waiting for Next
+function drawCard(revealed){
+  const top = DECK[round], bottom = DECK[round + 1];
+  $('board').innerHTML = panel(top, true, false, null)
+                       + panel(bottom, revealed, true, top);
+  $('board').querySelectorAll('.call').forEach(b => {
+    b.onclick = e => { e.stopPropagation();
+                       b.dataset.dir === 'next' ? next() : answer(b.dataset.dir); };
+  });
+  open = !!revealed;
+  if (!revealed) {
+    $('seam').className = ''; $('seam').textContent = 'VS';
+    shownAt = performance.now();
+    busy = false;
   }
 }
 
-async function answer(card, dir){
-  if (answers[card]) return;
-  answers[card] = dir;
+// Anywhere on the board advances once the solution is up. The Next button is
+// the signpost, but on a short phone it can sit below the fold of a panel that
+// clips its overflow, and a student who cannot advance is stuck for the rest
+// of the game.
+$('s-board').addEventListener('click', () => { if (open) next(); });
+
+async function answer(dir){
+  if (busy) return;
+  busy = true;
+  answers[round] = dir;
   spentMs += shownAt ? Math.round(performance.now() - shownAt) : 0;
-  if (dir === rightFor(card)) correct++;
+  const ok = dir === rightFor(round);
+  if (ok) correct++;
   paintScore();
-  $('board').querySelectorAll('.call').forEach(b => {
-    b.disabled = true; b.setAttribute('aria-pressed', String(b.dataset.dir === dir));
-  });
+  drawCard(true);
+  $('seam').className = ok ? 'right' : 'wrong';
+  $('seam').innerHTML = ok ? TICK : CROSS;
+  await publish();
+}
+
+async function next(){
+  if (!open) return;
+  open = false;
+  round++;
+  if (round + 1 >= DECK.length) { await finish(); return; }
+  drawCard(false);
+  publish();
+}
+
+// Written as the student goes, so the instructor's panel can show how far
+// through the deck each person is, and so a phone that dies mid-game still
+// leaves its answers behind.
+async function publish(extra){
   try {
     await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null,
                           answers, correct, answered: Object.keys(answers).length,
-                          spentMs },
-                    { merge: true });
+                          spentMs, at: round, ...(extra || {}) }, { merge: true });
   } catch (e) { /* a dropped write must not stop play; the local score stands */ }
 }
 
+let finished = false;
+async function finish(){
+  finished = true;
+  const pct = Math.round(correct / (DECK.length - 1) * 100);
+  $('donepct').textContent = pct + '%';
+  $('donepct').style.color = colour(pct);
+  show('s-done');
+  await publish({ done: true });
+}
+
+function drawRanking(){
+  const n = DECK.length - 1;
+  const pct = Math.round(correct / n * 100);
+  $('finalpct').textContent = pct + '%';
+  $('finalpct').style.color = colour(pct);
+  $('finalsub').textContent = correct + ' of ' + n + ' right';
+  $('ladder').innerHTML = DECK.slice().sort((x,y) => y.g - x.g).map((it,i) =>
+    `<li><span class="rk">${i+1}</span><span class="nm">${esc(it.name)}<i>${esc(it.short || it.serve)}</i></span><span class="vl">${it.g}</span></li>`
+  ).join('');
+}
+
 // ---------------------------------------------------------------------------
-// Session
+// Session. The server publishes four states, none of which expires: lobby,
+// playing, ranking, podium. A snapshot that arrives late is harmless.
 // ---------------------------------------------------------------------------
 const app = initializeApp(FIREBASE_CONFIG);
 const a = auth.getAuth(app);
 await auth.signInAnonymously(a);
 const uid = a.currentUser.uid;
 const db = fs.getFirestore(app);
-let me = null, SESSION = null, skew = 0, ticker = null;
+let me = null, SESSION = null;
 
-const show = id => ['s-join','s-rules','s-wait','s-board','s-final','s-podium']
-  .forEach(s => $(s).hidden = (s !== id));
+const show = id => ['s-join','s-rules','s-wait','s-board','s-done','s-final','s-podium']
+  .forEach(x => $(x).hidden = (x !== id));
 
-// --- check in ---
 const canJoin = () => $('code').value.trim().length === 4 && $('name').value.trim().length > 0;
 const refresh = () => { $('join').disabled = !canJoin(); };
 $('code').addEventListener('input', refresh);
@@ -436,8 +512,8 @@ $('join').onclick = async () => {
   try {
     const snap = await fs.getDoc(fs.doc(db, 'sessions', code));
     const d = snap.exists() ? snap.data() : null;
-    if (!d || d.game !== 'lca-hol') { throw new Error('That code does not match a game.'); }
-    if (d.stage === 'closed') { throw new Error('Check-in is not open yet.'); }
+    if (!d || d.game !== 'lca-hol') throw new Error('That code does not match a game.');
+    if (d.stage === 'closed') throw new Error('Check-in is not open yet.');
     me = fs.doc(db, `sessions/${code}/groups/${uid}`);
     // The Firestore rules this project already runs demand all three of these
     // on every write: the document must name its owner, must not be submitted,
@@ -445,7 +521,7 @@ $('join').onclick = async () => {
     // with "Missing or insufficient permissions" and nothing else.
     await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null,
                           name, ready: false, answers: {}, correct: 0,
-                          joinedAt: Date.now() }, { merge: true });
+                          at: 0, done: false, joinedAt: Date.now() }, { merge: true });
     try { localStorage.setItem('hol_class', JSON.stringify({ code, name })); } catch (e) {}
     watch(code);
     show('s-rules');
@@ -459,14 +535,13 @@ $('ready').onclick = async () => {
   show('s-wait');
   try { await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null, ready: true },
                         { merge: true }); } catch (e) {}
+  render();                      // the instructor may already have started
 };
 
 function watch(code){
   fs.onSnapshot(fs.doc(db, 'sessions', code), snap => {
     const d = snap.data(); if (!d) return;
-    // one clock for the room: trust the server's notion of now
-    SESSION = d;
-    render();
+    SESSION = d; render();
   });
   fs.onSnapshot(fs.doc(db, `sessions/${code}/public/podium`), snap => {
     const p = snap.data(); if (p) drawPodium(p);
@@ -475,43 +550,20 @@ function watch(code){
 
 function render(){
   const d = SESSION; if (!d) return;
-  if (d.stage === 'question' || d.stage === 'answer') {
-    show('s-board');
-    drawBoard(d.card, d.stage);
-    runClock();
-  } else if (d.stage === 'final') {
-    show('s-final'); drawFinal();
+  $('veil').classList.toggle('on', !!d.paused && d.stage === 'playing' && !finished);
+
+  if (d.stage === 'playing') {
+    if (finished) { show('s-done'); return; }
+    // Entering the board is one-way: a re-delivered snapshot must never throw
+    // a student back to the first card.
+    if ($('s-board').hidden) { show('s-board'); drawCard(false); paintScore(); }
+  } else if (d.stage === 'ranking') {
+    drawRanking(); show('s-final');
   } else if (d.stage === 'podium') {
     show('s-podium');
-  } else if ($('s-board').hidden === false) {
-    show('s-wait');
+  } else if (!$('s-board').hidden || !$('s-done').hidden) {
+    show('s-wait');              // the instructor opened a new session under us
   }
-}
-
-function runClock(){
-  clearInterval(ticker);
-  const paint = () => {
-    const d = SESSION; if (!d || !d.deadline) { $('clock').textContent = ''; return; }
-    const left = Math.max(0, Math.ceil((d.deadline - Date.now()) / 1000));
-    // During the solution the clock only appears for the last five seconds, so
-    // the next card never arrives unannounced but the reveal is not a race.
-    if (d.stage === 'answer' && left > 5) { $('clock').textContent = ''; $('clock').className = ''; return; }
-    $('clock').textContent = d.paused ? '⏸' : left;
-    $('clock').className = (!d.paused && left <= 5) ? 'urgent' : '';
-  };
-  paint();
-  ticker = setInterval(paint, 250);
-}
-
-function drawFinal(){
-  const n = DECK.length - 1;
-  const pct = Math.round(correct / n * 100);
-  $('finalpct').textContent = pct + '%';
-  $('finalpct').style.color = colour(pct);
-  $('finalsub').textContent = correct + ' of ' + n + ' right';
-  $('ladder').innerHTML = DECK.slice().sort((x,y) => y.g - x.g).map((it,i) =>
-    `<li><span class="rk">${i+1}</span><span class="nm">${esc(it.name)}<i>${esc(it.short || it.serve)}</i></span><span class="vl">${it.g}</span></li>`
-  ).join('');
 }
 
 function drawPodium(p){
