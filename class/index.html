@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0f0c">
+<meta name="robots" content="noindex">
+<title>LCA Higher or Lower</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* The classroom version. One screen at a time, all of them driven by the
+   session document the instructor's Mac is writing. The solo game's look is
+   kept; its self-paced controller is not. */
+:root{
+  --ink:#ffffff; --ink-dim:rgba(255,255,255,.72); --ink-faint:rgba(255,255,255,.45);
+  --shade:#0d0f0c; --cream:#f4efe3; --seed:#17190f;
+  --leaf:#6BAC5F; --berry:#C05B58;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--shade);color:var(--ink);font-family:var(--body);
+     overflow:hidden;-webkit-text-size-adjust:100%;
+     -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{touch-action:manipulation}
+
+#app{position:relative;height:100%;overflow:hidden}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;overflow-y:auto;
+  padding-block:1.5rem 4.2rem;
+  padding-left:max(20px,env(safe-area-inset-left,0px));
+  padding-right:max(20px,env(safe-area-inset-right,0px));}
+@supports (justify-content: safe center){ .screen{justify-content:safe center} }
+.pale{background:var(--cream);color:var(--seed)}
+
+/* ---------- the mark ---------- */
+.logo{display:flex;flex-direction:column;align-items:center;flex:none}
+.logo svg{display:block;height:auto}
+.logo .words{font-family:var(--display);text-transform:uppercase;color:inherit;
+  font-weight:300;line-height:.96;white-space:nowrap}
+.logo .row{display:block}
+.logo [data-logoline]{display:inline-block}
+.logo b{font-weight:700;font-style:normal}
+
+/* ---------- forms and buttons ---------- */
+.field{width:min(20rem,86vw);margin-top:1.5rem}
+.field label{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:rgba(21,23,15,.55);margin-bottom:.35rem}
+.field input{width:100%;font:inherit;font-size:1.05rem;padding:.7rem .9rem;
+  border:1.5px solid rgba(21,23,15,.25);border-radius:12px;background:#fff;
+  color:var(--seed);user-select:text;-webkit-user-select:text}
+.field input:focus{outline:3px solid rgba(21,23,15,.35);outline-offset:1px}
+#code{letter-spacing:.3em;font-weight:700;text-align:center}
+.cta{margin-top:1.6rem;appearance:none;border:0;cursor:pointer;border-radius:999px;
+  background:var(--seed);color:var(--cream);font-family:var(--body);font-weight:600;
+  font-size:1.02rem;letter-spacing:.015em;padding:.78rem 2.6rem}
+.cta:disabled{opacity:.4;cursor:not-allowed}
+.pitch{margin:2.2rem 0 0;max-width:27ch;text-align:center;
+  font-size:clamp(.95rem,4.1vw,1.08rem);line-height:1.5;color:rgba(21,23,15,.78)}
+.err{margin:.9rem 0 0;color:#9a3b36;font-size:.9rem;font-weight:600;min-height:1.2em}
+.rules{max-width:30ch;display:flex;flex-direction:column;gap:1.8rem}
+.rules p{margin:0;font-size:clamp(.98rem,4.2vw,1.1rem);line-height:1.52;
+  color:rgba(21,23,15,.82)}
+.foot{position:absolute;left:0;right:0;bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));
+  text-align:center;font-size:.64rem;line-height:1.55;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:600;color:rgba(21,23,15,.5)}
+.waitline{margin-top:2.2rem;font-size:1.02rem;color:rgba(21,23,15,.72);max-width:22ch;
+  text-align:center;line-height:1.5}
+
+/* ---------- the board ---------- */
+#board{position:absolute;inset:0;display:flex;flex-direction:column}
+.panel{position:relative;flex:1 1 50%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;overflow:hidden;
+  padding-block:1rem;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));}
+.panel::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.44)),
+             linear-gradient(180deg,var(--w1),var(--w2)),
+             var(--img) center/cover no-repeat,
+             radial-gradient(120% 90% at 50% 10%,var(--c1) 0%,var(--c2) 62%,var(--c3) 100%);
+  background-size:cover,cover,cover,cover;background-position:center}
+.panel>*{position:relative;z-index:2}
+.name{font-family:var(--display);font-weight:600;
+  font-size:clamp(1.3rem,6.7vw,2.1rem);line-height:1.02;text-transform:uppercase;
+  text-wrap:balance;max-width:16ch;text-shadow:0 2px 14px rgba(0,0,0,.4)}
+.serve{font-size:clamp(.92rem,4.1vw,1.08rem);line-height:1.25;margin-top:.2rem;
+  max-width:20ch;font-weight:500;text-shadow:0 1px 10px rgba(0,0,0,.45)}
+.serve span{display:inline-block;font-weight:700;font-variant-numeric:tabular-nums;
+  background:rgba(0,0,0,.38);border-radius:999px;padding:.1em .55em;margin-left:.3em;
+  white-space:nowrap}
+.figure{font-family:var(--display);font-weight:700;
+  font-size:clamp(2.2rem,12vw,3.6rem);line-height:.92;font-variant-numeric:tabular-nums;
+  text-shadow:0 3px 18px rgba(0,0,0,.45);margin-top:.35rem}
+.unit{font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-dim);margin-top:.2rem;font-weight:500}
+.why{font-size:.8rem;line-height:1.35;margin-top:.5rem;max-width:30ch;opacity:.94}
+.calls{display:flex;flex-direction:column;gap:.45rem;margin-top:.7rem;width:min(15.5rem,80vw)}
+.call{appearance:none;border:0;color:#17190f;font-family:var(--display);
+  font-size:1.18rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  padding:.6rem 1rem;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  box-shadow:0 3px 14px rgba(0,0,0,.3);transition:filter .16s,transform .1s}
+.call[data-dir="up"]{background:#E9A6A3}
+.call[data-dir="down"]{background:#A8D29F}
+.call:active{transform:scale(.97)}
+.call[aria-pressed="true"]{box-shadow:0 0 0 3px #fff,0 3px 14px rgba(0,0,0,.35)}
+.call:disabled{opacity:.55;cursor:default}
+.call svg{width:.78em;height:.78em;flex:none;stroke-width:3.4}
+#seam{position:absolute;top:50%;left:50%;z-index:25;transform:translate(-50%,-50%);
+  width:3rem;height:3rem;border-radius:50%;background:#fff;color:#111;display:grid;
+  place-items:center;font-family:var(--display);font-weight:700;font-size:.95rem;
+  box-shadow:0 0 0 5px rgba(13,15,12,.9),0 8px 26px rgba(0,0,0,.5);pointer-events:none;
+  transition:background .25s,color .25s}
+#seam.right{background:#A8D29F;color:#07230f}
+#seam.wrong{background:#E9A6A3;color:#2b0606}
+#seam svg{width:1.4rem;height:1.4rem}
+
+/* ---------- the clock and the score ---------- */
+#hud{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;
+  justify-content:space-between;align-items:flex-start;
+  padding-top:calc(.65rem + env(safe-area-inset-top,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));pointer-events:none}
+#clock{font-family:var(--display);font-weight:700;font-size:1.9rem;line-height:1;
+  font-variant-numeric:tabular-nums;background:rgba(0,0,0,.58);border-radius:999px;
+  padding:.12em .5em;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+#clock.urgent{animation:beat .6s steps(1) infinite}
+@keyframes beat{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
+#score{font-family:var(--display);font-weight:700;font-size:1.7rem;line-height:1;
+  font-variant-numeric:tabular-nums;background:rgba(0,0,0,.58);border-radius:999px;
+  padding:.16em .5em;box-shadow:0 0 0 1px rgba(255,255,255,.14);transition:color .45s}
+
+/* ---------- endings ---------- */
+.big{font-family:var(--display);font-weight:700;font-size:clamp(3rem,18vw,5rem);line-height:.9}
+.kicker{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);font-weight:600}
+.subline{font-family:var(--display);font-size:1.05rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-dim);margin-top:.15rem}
+.ladder-head{margin:1.4rem 0 .4rem;font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.ladder{list-style:none;margin:0;padding:0;width:min(23rem,88vw);
+  display:flex;flex-direction:column;gap:.28rem}
+.ladder li{display:flex;align-items:baseline;gap:.55rem;font-size:.84rem;
+  padding:.4rem .65rem;border-radius:7px;background:rgba(255,255,255,.07)}
+.ladder .rk{font-family:var(--display);font-weight:700;color:var(--ink-faint);
+  width:1.2rem;flex:none;font-variant-numeric:tabular-nums}
+.ladder .nm{flex:1;min-width:0;text-align:left}
+.ladder .nm i{font-style:normal;color:var(--ink-faint);font-size:.88em}
+.ladder .nm i::before{content:", "}
+.ladder .vl{font-family:var(--display);font-weight:700;font-size:1rem;
+  font-variant-numeric:tabular-nums}
+.steps{display:flex;align-items:flex-end;gap:.6rem;margin-top:1.6rem}
+.step{background:rgba(255,255,255,.1);border-radius:10px 10px 0 0;padding:.7rem .5rem .6rem;
+  width:min(6.4rem,27vw);text-align:center}
+.step .pos{font-family:var(--display);font-weight:700;font-size:1.5rem;color:var(--ink-faint)}
+.step .who{font-size:.8rem;font-weight:600;line-height:1.25;margin-top:.2rem;
+  overflow-wrap:anywhere}
+.step .pc{font-family:var(--display);font-weight:700;font-size:1.3rem;margin-top:.25rem}
+.step.p1{height:9.5rem;background:rgba(168,210,159,.22)}
+.step.p2{height:7.8rem} .step.p3{height:6.6rem}
+.avg{margin-top:1.8rem;text-align:center}
+.avg .n{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1}
+.avg .l{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);font-weight:600;margin-top:.2rem}
+.tiebreak{margin:1.6rem 0 0;font-size:.78rem;color:var(--ink-faint);text-align:center}
+
+@media (orientation:landscape) and (max-height:520px){
+  #turn{display:flex!important}
+}
+#turn{display:none;position:absolute;inset:0;z-index:90;background:var(--cream);
+  color:var(--seed);flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;text-align:center;padding:0 22px}
+#turn p{margin:0;font-size:1.05rem;font-weight:500;max-width:18ch;line-height:1.45}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="turn">
+    <svg viewBox="0 0 48 48" width="52" height="52" aria-hidden="true">
+      <rect x="15" y="4" width="18" height="40" rx="3.4" fill="none" stroke="currentColor" stroke-width="2.6"/>
+      <path d="M9 30 A14 14 0 0 0 23 44" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M5.4 25.6 L9 30.4 L13.6 27" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>Turn your phone upright to play.</p>
+  </div>
+
+  <!-- 1 · check in -->
+  <section class="screen pale" id="s-join">
+    <div class="logo" id="logo1"></div>
+    <div class="field">
+      <label for="code">Code from the screen</label>
+      <input id="code" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="0000">
+    </div>
+    <div class="field">
+      <label for="name">Your name</label>
+      <input id="name" autocomplete="off" maxlength="60" placeholder="Name, or both names">
+    </div>
+    <p class="err" id="joinerr"></p>
+    <button class="cta" id="join" disabled>I&rsquo;m in</button>
+    <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
+  </section>
+
+  <!-- 2 · the rules -->
+  <section class="screen pale" id="s-rules" hidden>
+    <div class="rules">
+      <p>For each pair of foods or drinks, say which one carries the higher
+        total emissions, measured in grams of CO<sub>2</sub> equivalent.</p>
+      <p>The figure covers the whole life cycle: growing or rearing it,
+        processing, packaging, transport, the shop, and keeping it at home.</p>
+      <p>The answer depends on the food and on the size of the serving.
+        Every card shows one serving.</p>
+      <p style="font-weight:600">You have 15 seconds for each pair.</p>
+    </div>
+    <button class="cta" id="ready">I&rsquo;m ready</button>
+    <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
+  </section>
+
+  <!-- 3 · waiting -->
+  <section class="screen pale" id="s-wait" hidden>
+    <div class="logo" id="logo2"></div>
+    <p class="waitline">Wait for the instructor to start the game.</p>
+    <p class="foot">30296 Global Sustainability Strategy<br>Bocconi University</p>
+  </section>
+
+  <!-- 4 · the board -->
+  <section id="s-board" hidden>
+    <div id="hud"><div id="clock">15</div><div id="score">&ndash;</div></div>
+    <div id="board"></div>
+    <div id="seam">VS</div>
+  </section>
+
+  <!-- 5 · your score and the ranking -->
+  <section class="screen" id="s-final" hidden>
+    <p class="kicker">You scored</p>
+    <p class="big" id="finalpct">&ndash;</p>
+    <p class="subline" id="finalsub"></p>
+    <p class="ladder-head">grams of CO&#8322;e per serving</p>
+    <ol class="ladder" id="ladder"></ol>
+  </section>
+
+  <!-- 6 · the podium -->
+  <section class="screen" id="s-podium" hidden>
+    <p class="kicker">The class</p>
+    <div class="steps" id="steps"></div>
+    <div class="avg"><div class="n" id="avg">&ndash;</div><div class="l">class average</div></div>
+    <p class="tiebreak">Ties are broken by how fast you answered.</p>
+  </section>
+
+</div>
+
+<script src="deck.js"></script>
+<script type="module">
+import { FIREBASE_CONFIG } from './firebase-config.js';
+const [{ initializeApp }, auth, fs] = await Promise.all([
+  import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
+  import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'),
+  import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')
+]);
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---------------------------------------------------------------------------
+// The mark, letter-spaced to the triangles' width. Same rule as the solo game:
+// measure the unspaced string once and distribute the slack, after the exact
+// face has loaded — document.fonts.ready can resolve before it applies.
+// ---------------------------------------------------------------------------
+function head(dir, w, fill){
+  const h = Math.round(w*0.46), r = Math.round(w*0.055), p = r;
+  const pts = dir === 'up' ? [[w/2,p],[w-p,h-p],[p,h-p]] : [[w/2,h-p],[p,p],[w-p,p]];
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" aria-hidden="true"><path d="M${
+    pts.map(q=>q.join(' ')).join(' L')} Z" fill="${fill}" stroke="${fill}" stroke-width="${r*2}" stroke-linejoin="round"/></svg>`;
+}
+function buildLogo(box){
+  if (!box) return;
+  const w = Math.min(210, Math.round(window.innerWidth * 0.58));
+  const size = Math.round(w * 0.227);
+  box.innerHTML = head('up', w, 'var(--berry)') +
+    `<div class="words" style="font-size:${size}px;margin:${Math.round(w*0.068)}px 0">
+       <div class="row"><span data-logoline><b>LCA</b> HIGHER</span></div>
+       <div class="row"><span data-logoline>OR LOWER</span></div></div>` +
+    head('down', w, 'var(--leaf)');
+  const fit = () => box.querySelectorAll('[data-logoline]').forEach(line => {
+    line.style.letterSpacing = '0px'; line.style.marginRight = '0px';
+    const w0 = line.getBoundingClientRect().width, gaps = line.textContent.length - 1;
+    if (!w0 || gaps < 1) return;
+    const ls = (w - w0) / gaps;
+    line.style.letterSpacing = ls + 'px'; line.style.marginRight = (-ls) + 'px';
+  });
+  Promise.all([`300 ${size}px "Barlow Condensed"`, `700 ${size}px "Barlow Condensed"`]
+    .map(f => document.fonts.load(f))).then(() => requestAnimationFrame(fit));
+}
+buildLogo($('logo1')); buildLogo($('logo2'));
+addEventListener('resize', () => { buildLogo($('logo1')); buildLogo($('logo2')); });
+
+// ---------------------------------------------------------------------------
+// Scoring, local. Nobody is told anyone else's score before the podium.
+// ---------------------------------------------------------------------------
+const RAMP_OK = [124,196,89], RAMP_BAD = [240,94,95];
+const colour = pct => {
+  const t = Math.max(0, Math.min(1, (100 - pct) / 80));
+  return 'rgb(' + [0,1,2].map(i => Math.round(RAMP_OK[i] + (RAMP_BAD[i]-RAMP_OK[i])*t)).join(',') + ')';
+};
+const GROUPS = {
+  meat:{c:['#e8775f','#a8301f','#4a0f0a'],w:['rgba(190,55,35,.54)','rgba(70,14,10,.86)']},
+  fish:{c:['#7fc5d6','#2b7f99','#0d3240'],w:['rgba(42,125,152,.54)','rgba(10,44,56,.86)']},
+  dairy:{c:['#f3dca4','#c79a3c','#5c4214'],w:['rgba(198,152,58,.52)','rgba(84,60,18,.86)']},
+  plant:{c:['#a9d98a','#558c38','#1f3b14'],w:['rgba(86,140,56,.54)','rgba(28,56,20,.86)']},
+  veg:{c:['#9ed36a','#4e8c2f','#1f3d13'],w:['rgba(96,160,52,.54)','rgba(28,62,18,.86)']},
+  fruit:{c:['#f6b36a','#d2722a','#5e2c0c'],w:['rgba(208,112,40,.54)','rgba(86,40,12,.86)']},
+  staple:{c:['#e9c88f','#b07f3c','#4b3113'],w:['rgba(176,126,60,.54)','rgba(70,46,18,.86)']},
+  snack:{c:['#d8a0c4','#95457f','#3c1130'],w:['rgba(148,68,126,.52)','rgba(56,16,44,.86)']},
+  drink:{c:['#9ec6e8','#3d6f9e','#13293d'],w:['rgba(60,110,156,.54)','rgba(18,38,58,.86)']}
+};
+const CHEV_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+const CHEV_DN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg>';
+const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+const answers = {};           // card index -> 'up' | 'down'
+let correct = 0;
+// How long each answer took, summed. The tiebreak on the podium: with fifty
+// cards and a room of thirty, two people on the same score is likely, and
+// alphabetical order is not a reason to win. Timed from when this phone first
+// painted the card, not from the shared deadline, so a phone whose clock is
+// off by a few seconds is not handed an advantage or a penalty.
+let spentMs = 0, shownAt = 0;
+
+function rightFor(i){ return DECK[i+1].g >= DECK[i].g ? 'up' : 'down'; }
+
+function paintScore(){
+  const n = Object.keys(answers).length;
+  if (!n) { $('score').textContent = '–'; $('score').style.color = 'rgba(255,255,255,.75)'; return; }
+  const pct = Math.round(correct / n * 100);
+  $('score').textContent = pct + '%';
+  $('score').style.color = colour(pct);
+}
+
+// ---------------------------------------------------------------------------
+// The board. Two panels, redrawn per card: there is no sliding deck here
+// because the server decides which card is on screen.
+// ---------------------------------------------------------------------------
+function panel(food, revealed, challenger, prev){
+  const g = GROUPS[food.group] || GROUPS.veg;
+  const src = PHOTOS[food.name];
+  const style = `--c1:${g.c[0]};--c2:${g.c[1]};--c3:${g.c[2]};--w1:${g.w[0]};--w2:${g.w[1]}`
+              + (src ? `;--img:url(${src})` : '');
+  let inner = `<h2 class="name">${esc(food.name)}</h2>
+    <p class="serve">${esc(food.serve)} <span>${esc(food.p)}</span></p>`;
+  if (revealed) {
+    inner += `<div class="figure">${food.g}</div><div class="unit">g CO&#8322;e</div>`;
+    if (challenger) inner += `<p class="why">${esc(food.why)}</p>`;
+  } else if (challenger) {
+    inner += `<p class="serve" style="opacity:.9">higher or lower than ${esc(prev.name.toLowerCase())}?</p>
+      <div class="calls">
+        <button class="call" data-dir="up" aria-pressed="false">${CHEV_UP}Higher</button>
+        <button class="call" data-dir="down" aria-pressed="false">${CHEV_DN}Lower</button>
+      </div>`;
+  }
+  return `<section class="panel" style="${style}">${inner}</section>`;
+}
+
+let drawnKey = '';
+function drawBoard(card, stage){
+  const key = card + '/' + stage;
+  const top = DECK[card], bottom = DECK[card+1];
+  if (key !== drawnKey) {
+    $('board').innerHTML = panel(top, true, false, null)
+                         + panel(bottom, stage === 'answer', true, top);
+    drawnKey = key;
+    if (stage === 'question') {
+      const chosen = answers[card];
+      $('board').querySelectorAll('.call').forEach(b => {
+        if (chosen) { b.disabled = true; b.setAttribute('aria-pressed', String(b.dataset.dir === chosen)); }
+        b.onclick = () => answer(card, b.dataset.dir);
+      });
+      $('seam').className = ''; $('seam').textContent = 'VS';
+      shownAt = performance.now();
+    } else {
+      const given = answers[card];
+      const ok = given === rightFor(card);
+      $('seam').className = given ? (ok ? 'right' : 'wrong') : 'wrong';
+      $('seam').innerHTML = given ? (ok ? TICK : CROSS) : CROSS;
+    }
+  }
+}
+
+async function answer(card, dir){
+  if (answers[card]) return;
+  answers[card] = dir;
+  spentMs += shownAt ? Math.round(performance.now() - shownAt) : 0;
+  if (dir === rightFor(card)) correct++;
+  paintScore();
+  $('board').querySelectorAll('.call').forEach(b => {
+    b.disabled = true; b.setAttribute('aria-pressed', String(b.dataset.dir === dir));
+  });
+  try {
+    await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null,
+                          answers, correct, answered: Object.keys(answers).length,
+                          spentMs },
+                    { merge: true });
+  } catch (e) { /* a dropped write must not stop play; the local score stands */ }
+}
+
+// ---------------------------------------------------------------------------
+// Session
+// ---------------------------------------------------------------------------
+const app = initializeApp(FIREBASE_CONFIG);
+const a = auth.getAuth(app);
+await auth.signInAnonymously(a);
+const uid = a.currentUser.uid;
+const db = fs.getFirestore(app);
+let me = null, SESSION = null, skew = 0, ticker = null;
+
+const show = id => ['s-join','s-rules','s-wait','s-board','s-final','s-podium']
+  .forEach(s => $(s).hidden = (s !== id));
+
+// --- check in ---
+const canJoin = () => $('code').value.trim().length === 4 && $('name').value.trim().length > 0;
+const refresh = () => { $('join').disabled = !canJoin(); };
+$('code').addEventListener('input', refresh);
+$('name').addEventListener('input', refresh);
+
+$('join').onclick = async () => {
+  const code = $('code').value.trim(), name = $('name').value.trim();
+  $('join').disabled = true; $('joinerr').textContent = '';
+  try {
+    const snap = await fs.getDoc(fs.doc(db, 'sessions', code));
+    const d = snap.exists() ? snap.data() : null;
+    if (!d || d.game !== 'lca-hol') { throw new Error('That code does not match a game.'); }
+    if (d.stage === 'closed') { throw new Error('Check-in is not open yet.'); }
+    me = fs.doc(db, `sessions/${code}/groups/${uid}`);
+    // The Firestore rules this project already runs demand all three of these
+    // on every write: the document must name its owner, must not be submitted,
+    // and a student may never write a score. Omitting any one of them fails
+    // with "Missing or insufficient permissions" and nothing else.
+    await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null,
+                          name, ready: false, answers: {}, correct: 0,
+                          joinedAt: Date.now() }, { merge: true });
+    try { localStorage.setItem('hol_class', JSON.stringify({ code, name })); } catch (e) {}
+    watch(code);
+    show('s-rules');
+  } catch (e) {
+    $('joinerr').textContent = e.message || 'Could not join.';
+    $('join').disabled = false;
+  }
+};
+
+$('ready').onclick = async () => {
+  show('s-wait');
+  try { await fs.setDoc(me, { ownerUid: uid, submitted: false, score: null, ready: true },
+                        { merge: true }); } catch (e) {}
+};
+
+function watch(code){
+  fs.onSnapshot(fs.doc(db, 'sessions', code), snap => {
+    const d = snap.data(); if (!d) return;
+    // one clock for the room: trust the server's notion of now
+    SESSION = d;
+    render();
+  });
+  fs.onSnapshot(fs.doc(db, `sessions/${code}/public/podium`), snap => {
+    const p = snap.data(); if (p) drawPodium(p);
+  });
+}
+
+function render(){
+  const d = SESSION; if (!d) return;
+  if (d.stage === 'question' || d.stage === 'answer') {
+    show('s-board');
+    drawBoard(d.card, d.stage);
+    runClock();
+  } else if (d.stage === 'final') {
+    show('s-final'); drawFinal();
+  } else if (d.stage === 'podium') {
+    show('s-podium');
+  } else if ($('s-board').hidden === false) {
+    show('s-wait');
+  }
+}
+
+function runClock(){
+  clearInterval(ticker);
+  const paint = () => {
+    const d = SESSION; if (!d || !d.deadline) { $('clock').textContent = ''; return; }
+    const left = Math.max(0, Math.ceil((d.deadline - Date.now()) / 1000));
+    // During the solution the clock only appears for the last five seconds, so
+    // the next card never arrives unannounced but the reveal is not a race.
+    if (d.stage === 'answer' && left > 5) { $('clock').textContent = ''; $('clock').className = ''; return; }
+    $('clock').textContent = d.paused ? '⏸' : left;
+    $('clock').className = (!d.paused && left <= 5) ? 'urgent' : '';
+  };
+  paint();
+  ticker = setInterval(paint, 250);
+}
+
+function drawFinal(){
+  const n = DECK.length - 1;
+  const pct = Math.round(correct / n * 100);
+  $('finalpct').textContent = pct + '%';
+  $('finalpct').style.color = colour(pct);
+  $('finalsub').textContent = correct + ' of ' + n + ' right';
+  $('ladder').innerHTML = DECK.slice().sort((x,y) => y.g - x.g).map((it,i) =>
+    `<li><span class="rk">${i+1}</span><span class="nm">${esc(it.name)}<i>${esc(it.short || it.serve)}</i></span><span class="vl">${it.g}</span></li>`
+  ).join('');
+}
+
+function drawPodium(p){
+  const order = [1,0,2];                       // second, first, third
+  $('steps').innerHTML = order.filter(i => p.top && p.top[i]).map(i => {
+    const t = p.top[i];
+    return `<div class="step p${i+1}"><div class="pos">${i+1}</div>
+      <div class="who">${esc(t.name)}</div><div class="pc">${t.pct}%</div></div>`;
+  }).join('');
+  $('avg').textContent = (p.avg != null ? p.avg : 0) + '%';
+}
+
+// A phone that sleeps and wakes rejoins at whatever card the room is on.
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+
+// Rejoin after a reload without retyping the code.
+try {
+  const saved = JSON.parse(localStorage.getItem('hol_class') || 'null');
+  if (saved && saved.code) { $('code').value = saved.code; $('name').value = saved.name || ''; refresh(); }
+} catch (e) {}
+</script>
+</body>
+</html>
