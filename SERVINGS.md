@@ -192,7 +192,7 @@ kilogram of fruit.
 |---|---|---|---|
 | Beer | **1 small bottle or can** | 330 ml | 446 |
 | Red wine | 1 wine glass | 125 ml | 159 |
-| Gin | the gin in one gin and tonic | 25 ml | 32 |
+| Gin | 1 shot of gin | 25 ml | 32 |
 | Coffee | 1 espresso | 7 g ground | 59 |
 | Tea | 1 cup | 220 ml | 10 |
 | Orange juice | 1 small glass | 150 ml | 136 |
